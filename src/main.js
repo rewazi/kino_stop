@@ -7,6 +7,7 @@ const articles = {
     subtitle: 'Немое кино не было безмолвным. Оно говорило монтажом, жестом и светом — и придумало грамматику, которой мы пользуемся до сих пор.',
     year: '1895—1927',
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1800&q=85',
+    tags: ['немое кино', 'монтаж', 'первые кадры'],
     body: [
       'Первые показы братьев Люмьер были короткими зарисовками, но зритель сразу увидел в них не просто технический аттракцион, а новый способ смотреть на реальность. Поезд, прибывающий на вокзал, был событием именно потому, что двигался внутри рамки.',
       'Вскоре кино вышло за пределы фиксации. Жорж Мельес превратил камеру в сцену для иллюзий, а Дэвид Уорк Гриффит и Сергей Эйзенштейн начали собирать эмоцию из соседства планов. Монтаж стал не склейкой, а мыслью.'
@@ -19,6 +20,7 @@ const articles = {
     subtitle: 'Французская новая волна отказалась от гладкости студийного кино и вернула фильму нерв живого разговора.',
     year: '1958—1968',
     image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85',
+    tags: ['новая волна', 'Париж', 'свобода формы'],
     body: [
       'В конце 1950-х молодые критики журнала Cahiers du Cinéma стали режиссёрами. Жан-Люк Годар, Франсуа Трюффо, Аньес Варда и их коллеги снимали там, где была жизнь: в квартирах, кафе, на улицах Парижа.',
       'Их фильмы позволяли себе сбиваться, смотреть в объектив и оставлять монтажные швы видимыми. Новая волна напомнила: кино может быть не только иллюзией, но и личным высказыванием — лёгким, дерзким, несовершенным.'
@@ -31,6 +33,7 @@ const articles = {
     subtitle: 'Блокбастер превратил поход в кино в коллективный ритуал, а маркетинг — в часть самого зрелища.',
     year: '1975—1999',
     image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1800&q=85',
+    tags: ['блокбастеры', 'прокат', 'медиафраншизы'],
     body: [
       '«Челюсти» Стивена Спилберга стали первым настоящим летним блокбастером: фильм одновременно захватил экраны, разговоры и рекламные каналы. Через два года «Звёздные войны» доказали, что вселенная может продолжаться за пределами финальных титров.',
       'В эти десятилетия студии научились мыслить событием. Постер, трейлер, игрушка, саундтрек и сам фильм складывались в единый культурный опыт. Большой экран стал местом, где зрители приходили не только за историей, но и за масштабом.'
@@ -70,7 +73,20 @@ const authModal = `
 
 let authMode = 'login';
 let currentUser = null;
+let articleStore = { ...articles };
+let articlesLoaded = false;
 const apiUrl = (file) => `${new URL('api/', window.location.href).pathname}${file}`;
+
+async function fetchJson(url, options = {}) {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'same-origin',
+    ...options
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'Не удалось выполнить запрос.');
+  return data;
+}
 
 async function authRequest(file, options = {}) {
   const response = await fetch(apiUrl(file.replace(/\.php$/, '')), {
@@ -81,6 +97,20 @@ async function authRequest(file, options = {}) {
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || 'Не удалось выполнить запрос.');
   return data;
+}
+
+async function loadArticles() {
+  if (articlesLoaded) return;
+
+  try {
+    const data = await fetchJson('/api/articles');
+    const databaseArticles = Object.fromEntries((data.articles || []).map((article) => [article.slug, article]));
+    articleStore = { ...articleStore, ...databaseArticles };
+  } catch {
+    // Static articles remain available when the database is temporarily unavailable.
+  } finally {
+    articlesLoaded = true;
+  }
 }
 
 function setAuthMode(mode) {
@@ -108,9 +138,16 @@ function updateAuthArea(user) {
   currentUser = user;
   const area = document.querySelector('[data-auth-area]');
   if (!area) return;
+
+  const isAdmin = user && user.role === 'admin';
   area.innerHTML = user
-    ? `<span class="user-name">${user.name}</span><button class="auth-button" data-auth-logout>Выйти</button>`
+    ? `
+      <span class="user-name">${user.name}</span>
+      ${isAdmin ? '<button class="auth-button" data-admin-panel>Админ</button>' : ''}
+      <button class="auth-button" data-auth-logout>Выйти</button>
+    `
     : '<button class="auth-button" data-auth="login">Войти</button><button class="auth-button auth-button-primary" data-auth="register">Регистрация</button>';
+
   area.querySelectorAll('[data-auth]').forEach((button) => button.addEventListener('click', () => openAuth(button.dataset.auth)));
   area.querySelector('[data-auth-logout]')?.addEventListener('click', async () => {
     try {
@@ -118,11 +155,15 @@ function updateAuthArea(user) {
       updateAuthArea(null);
       const activeCommentForm = document.querySelector('[data-comment-form]');
       if (activeCommentForm) activeCommentForm.remove();
-      const activeComments = document.querySelector('[data-comments]');
+      const activeComments = document.querySelector('[data-comments-root]');
       if (activeComments) renderCommentsFromState();
     } catch {
       updateAuthArea(null);
     }
+  });
+
+  area.querySelector('[data-admin-panel]')?.addEventListener('click', () => {
+    layoutAdmin();
   });
 }
 
@@ -167,8 +208,162 @@ function home() {
       <div class="hero-poster reveal"><div class="poster-image"></div><div class="poster-label"><span>THE</span><strong>SEVENTH<br>SENSE</strong><small>Frames from a century</small></div><span class="poster-year">1895</span></div>
     </section>
     <section class="intro-band"><p class="section-kicker">Три поворотных момента</p><p class="intro-text">От первого мерцания плёнки до цифровых миров — кино каждый раз меняло не только экран, но и нас.</p></section>
-    <section class="timeline-preview"><div class="timeline-line"></div>${Object.entries(articles).map(([key, article], index) => `<a class="timeline-card reveal" href="#/article/${key}"><span class="card-index">0${index + 1}</span><div><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><span class="arrow">↗</span></div></a>`).join('')}</section>
+    <section class="timeline-preview"><div class="timeline-line"></div>${Object.entries(articleStore).map(([key, article], index) => `<a class="timeline-card reveal" href="#/article/${key}"><span class="card-index">${String(index + 1).padStart(2, '0')}</span><div><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></div></a>`).join('')}</section>
   `);
+}
+
+async function layoutAdmin() {
+  if (!currentUser || currentUser.role !== 'admin') {
+    openAuth('login');
+    return;
+  }
+
+  try {
+    const [articlesData, commentsData, tagsData] = await Promise.all([
+      fetchJson('/api/admin/articles', { method: 'GET' }),
+      fetchJson('/api/admin/comments', { method: 'GET' }),
+      fetchJson('/api/admin/tags', { method: 'GET' })
+    ]);
+
+    const content = `
+      <section class="admin-panel">
+        <div class="admin-header">
+          <p class="eyebrow">Администратор</p>
+          <h1>Панель управления</h1>
+        </div>
+
+        <div class="admin-sections">
+          <div class="admin-card">
+            <h2>Добавить статью</h2>
+            <form class="admin-form" data-admin-article-form>
+              <input name="slug" placeholder="slug (например, silent)" required>
+              <input name="section" placeholder="Раздел" required>
+              <input name="title" placeholder="Название статьи" required>
+              <textarea name="subtitle" placeholder="Короткое описание" required></textarea>
+              <input name="year" placeholder="Годы" required>
+              <input name="image" placeholder="URL изображения" required>
+              <textarea name="fact" placeholder="Факт из архива" required></textarea>
+              <textarea name="body" placeholder="Параграфы через новую строку" required></textarea>
+              <input name="tags" placeholder="Теги через запятую (например: история, монтаж)">
+              <button type="submit">Сохранить статью</button>
+            </form>
+          </div>
+
+          <div class="admin-card">
+            <h2>Теги</h2>
+            <form class="admin-form" data-admin-tag-form>
+              <input name="tag" placeholder="Название тега" required>
+              <button type="submit">Добавить тег</button>
+            </form>
+            <ul class="admin-list">${(tagsData.tags || []).map((tag) => `<li>${tag.name}</li>`).join('')}</ul>
+          </div>
+
+          <div class="admin-card admin-wide">
+            <h2>Теги статей</h2>
+            <ul class="admin-articles-list">
+              ${(articlesData.articles || []).map((article) => `
+                <li>
+                  <div>
+                    <strong>${article.title}</strong>
+                    <span class="admin-article-tags">${(article.tags || []).join(', ') || 'Тегов пока нет'}</span>
+                  </div>
+                  <form class="admin-tag-attach" data-article-id="${article.id}">
+                    <select name="tag" required>
+                      <option value="">Выберите тег</option>
+                      ${(tagsData.tags || []).map((tag) => `<option value="${tag.name}">${tag.name}</option>`).join('')}
+                    </select>
+                    <button type="submit">Добавить тег</button>
+                  </form>
+                </li>
+              `).join('') || '<li>Статей из базы пока нет.</li>'}
+            </ul>
+          </div>
+
+          <div class="admin-card admin-wide">
+            <h2>Комментарии</h2>
+            <ul class="admin-comments-list">
+              ${(commentsData.comments || []).map((comment) => `
+                <li>
+                  <div>
+                    <strong>${comment.name}</strong>
+                    <span>${comment.article_key}</span>
+                    <small>${new Date(comment.created_at).toLocaleString('ru-RU')}</small>
+                  </div>
+                  <p>${comment.text}</p>
+                  <button data-delete-comment="${comment.id}">Удалить</button>
+                </li>
+              `).join('') || '<li>Комментариев нет.</li>'}
+            </ul>
+          </div>
+        </div>
+      </section>
+    `;
+
+    layout(content, 'admin');
+
+    const articleForm = document.querySelector('[data-admin-article-form]');
+    articleForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(articleForm));
+      const body = data.body.split('\n').map((line) => line.trim()).filter(Boolean);
+      try {
+        await fetchJson('/api/admin/articles', {
+          method: 'POST',
+          body: JSON.stringify({ ...data, body })
+        });
+        articleForm.reset();
+        layoutAdmin();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    const tagForm = document.querySelector('[data-admin-tag-form]');
+    tagForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(tagForm));
+      try {
+        await fetchJson('/api/admin/tags', {
+          method: 'POST',
+          body: JSON.stringify({ name: data.tag })
+        });
+        tagForm.reset();
+        layoutAdmin();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+
+    document.querySelectorAll('[data-article-id]').forEach((form) => {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const tag = new FormData(form).get('tag');
+        try {
+          await fetchJson(`/api/admin/articles/${form.dataset.articleId}/tags`, {
+            method: 'POST',
+            body: JSON.stringify({ tag })
+          });
+          layoutAdmin();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-delete-comment]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const id = button.dataset.deleteComment;
+        try {
+          await fetchJson(`/api/admin/comments/${id}`, { method: 'DELETE' });
+          layoutAdmin();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+  } catch (error) {
+    alert(error.message);
+  }
 }
 
 async function fetchComments(articleKey) {
@@ -254,10 +449,10 @@ async function renderCommentsFromState() {
 }
 
 function articlePage(key) {
-  const article = articles[key] || articles.silent;
+  const article = articleStore[key] || articleStore.silent;
   layout(`
     <article class="article-page">
-      <div class="article-heading reveal"><p class="eyebrow">${article.section}</p><h1>${article.title}</h1><p class="article-subtitle">${article.subtitle}</p><div class="article-meta"><span>${article.year}</span><span>Чтение / 04 мин</span></div></div>
+      <div class="article-heading reveal"><p class="eyebrow">${article.section}</p><h1>${article.title}</h1><p class="article-subtitle">${article.subtitle}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><div class="article-meta"><span>${article.year}</span><span>Чтение / 04 мин</span></div></div>
       <div class="article-visual reveal"><img src="${article.image}" alt="Кинематографический кадр" /><span class="image-caption">Кадр как свидетель. Фильм как след.</span></div>
       <div class="article-grid"><div class="article-aside"><span class="vertical-label">КИНОСФЕРА / ЗАПИСКИ</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}<aside class="fact"><span class="fact-label">Заметка из архива</span><p>${article.fact}</p></aside><a class="text-link" href="#/">Вернуться к хронике <span>↗</span></a>
       <div class="comments-root" data-comments-root data-article-key="${key}"></div>
@@ -268,9 +463,10 @@ function articlePage(key) {
   renderCommentsFromState();
 }
 
-function render() {
+async function render() {
+  await loadArticles();
   const path = window.location.hash.replace('#', '') || '/';
-  const match = path.match(/^\/article\/(silent|nouvelle|blockbuster)$/);
+  const match = path.match(/^\/article\/([^/]+)$/);
   match ? articlePage(match[1]) : home();
   window.scrollTo(0, 0);
 }

@@ -7,6 +7,7 @@ import { registerHandler } from './api/register.js';
 import { loginHandler } from './api/login.js';
 import { logoutHandler } from './api/logout.js';
 import { getCommentsHandler, createCommentHandler } from './api/comments.js';
+import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminArticleTagsHandler, getArticlesHandler } from './api/admin.js';
 import { initializeDatabase } from './api/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -37,6 +38,15 @@ for (const [name, handler] of Object.entries(authHandlers)) {
 
 app.get('/api/comments/:articleKey', getCommentsHandler);
 app.post('/api/comments/:articleKey', createCommentHandler);
+app.get('/api/articles', getArticlesHandler);
+
+app.get('/api/admin/articles', adminArticlesHandler);
+app.post('/api/admin/articles', adminArticlesHandler);
+app.get('/api/admin/comments', adminCommentsHandler);
+app.delete('/api/admin/comments/:id', adminDeleteCommentHandler);
+app.get('/api/admin/tags', adminTagsHandler);
+app.post('/api/admin/tags', adminTagsHandler);
+app.post('/api/admin/articles/:id/tags', adminArticleTagsHandler);
 
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use((req, res, next) => {
