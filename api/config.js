@@ -1,5 +1,6 @@
 import mysql from 'mysql2/promise';
 import bcrypt from 'bcryptjs';
+import { defaultArticles } from './defaultArticles.js';
 
 const dbConfig = {
   host: process.env.DB_HOST || '127.0.0.1',
@@ -12,6 +13,34 @@ const dbConfig = {
 };
 
 export const pool = mysql.createPool(dbConfig);
+
+async function seedDefaultArticles() {
+  for (const article of defaultArticles) {
+    const [existingRows] = await pool.execute('SELECT id FROM articles WHERE slug = ?', [article.slug]);
+    let articleId = existingRows[0]?.id;
+
+    if (!articleId) {
+      const [result] = await pool.execute(
+        'INSERT INTO articles (slug, section, title, subtitle, year, image, body, fact) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [article.slug, article.section, article.title, article.subtitle, article.year, article.image, JSON.stringify(article.body), article.fact]
+      );
+      articleId = result.insertId;
+    }
+
+    for (const tagName of article.tags) {
+      const [tagRows] = await pool.execute('SELECT id FROM tags WHERE name = ?', [tagName]);
+      let tagId = tagRows[0]?.id;
+      if (!tagId) {
+        const [tagResult] = await pool.execute('INSERT INTO tags (name) VALUES (?)', [tagName]);
+        tagId = tagResult.insertId;
+      }
+      await pool.execute(
+        'INSERT INTO article_tags (article_id, tag_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE article_id = article_id',
+        [articleId, tagId]
+      );
+    }
+  }
+}
 
 export async function initializeDatabase() {
   const adminConnection = await mysql.createConnection({
@@ -94,6 +123,8 @@ export async function initializeDatabase() {
         CONSTRAINT fk_article_tags_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    await seedDefaultArticles();
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@kinosfera.local';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';

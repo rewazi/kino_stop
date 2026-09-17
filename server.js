@@ -7,7 +7,7 @@ import { registerHandler } from './api/register.js';
 import { loginHandler } from './api/login.js';
 import { logoutHandler } from './api/logout.js';
 import { getCommentsHandler, createCommentHandler } from './api/comments.js';
-import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminArticleTagsHandler, getArticlesHandler } from './api/admin.js';
+import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminDeleteTagHandler, adminArticleTagsHandler, adminDeleteArticleTagHandler, getArticlesHandler } from './api/admin.js';
 import { initializeDatabase } from './api/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,7 +46,9 @@ app.get('/api/admin/comments', adminCommentsHandler);
 app.delete('/api/admin/comments/:id', adminDeleteCommentHandler);
 app.get('/api/admin/tags', adminTagsHandler);
 app.post('/api/admin/tags', adminTagsHandler);
+app.delete('/api/admin/tags/:id', adminDeleteTagHandler);
 app.post('/api/admin/articles/:id/tags', adminArticleTagsHandler);
+app.delete('/api/admin/articles/:id/tags/:tagId', adminDeleteArticleTagHandler);
 
 app.use(express.static(path.join(__dirname, 'dist')));
 app.use((req, res, next) => {

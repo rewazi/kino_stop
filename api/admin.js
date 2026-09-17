@@ -34,7 +34,8 @@ export async function getArticlesHandler(req, res) {
   try {
     const [rows] = await pool.execute(`
       SELECT a.id, a.slug, a.section, a.title, a.subtitle, a.year, a.image, a.fact, a.body,
-             GROUP_CONCAT(t.name ORDER BY t.name SEPARATOR ', ') AS tags
+              GROUP_CONCAT(t.name ORDER BY t.name SEPARATOR ', ') AS tags,
+              GROUP_CONCAT(t.id ORDER BY t.name SEPARATOR ',') AS tag_ids
       FROM articles a
       LEFT JOIN article_tags at ON at.article_id = a.id
       LEFT JOIN tags t ON t.id = at.tag_id
@@ -45,7 +46,8 @@ export async function getArticlesHandler(req, res) {
     res.json({ articles: rows.map((article) => ({
       ...article,
       body: JSON.parse(article.body),
-      tags: article.tags ? article.tags.split(', ') : []
+      tags: article.tags ? article.tags.split(', ') : [],
+      tagIds: article.tag_ids ? article.tag_ids.split(',').map(Number) : []
     })) });
   } catch (error) {
     console.error('Ошибка получения статей:', error);
@@ -158,6 +160,23 @@ export async function adminTagsHandler(req, res) {
   }
 }
 
+export async function adminDeleteTagHandler(req, res) {
+  if (!requireAdmin(req, res)) return;
+
+  const tagId = Number(req.params.id);
+  if (!tagId) {
+    return res.status(400).json({ error: 'Некорректный ID тега.' });
+  }
+
+  try {
+    await pool.execute('DELETE FROM tags WHERE id = ?', [tagId]);
+    res.json({ success: true, message: 'Тег удалён.' });
+  } catch (error) {
+    console.error('Ошибка удаления тега:', error);
+    res.status(500).json({ error: 'Не удалось удалить тег.' });
+  }
+}
+
 export async function adminArticleTagsHandler(req, res) {
   if (!requireAdmin(req, res)) return;
 
@@ -174,5 +193,23 @@ export async function adminArticleTagsHandler(req, res) {
   } catch (error) {
     console.error('Ошибка привязки тега:', error);
     res.status(500).json({ error: 'Не удалось сохранить тег для статьи.' });
+  }
+}
+
+export async function adminDeleteArticleTagHandler(req, res) {
+  if (!requireAdmin(req, res)) return;
+
+  const articleId = Number(req.params.id);
+  const tagId = Number(req.params.tagId);
+  if (!articleId || !tagId) {
+    return res.status(400).json({ error: 'Некорректная статья или тег.' });
+  }
+
+  try {
+    await pool.execute('DELETE FROM article_tags WHERE article_id = ? AND tag_id = ?', [articleId, tagId]);
+    res.json({ success: true, message: 'Тег убран со статьи.' });
+  } catch (error) {
+    console.error('Ошибка удаления тега со статьи:', error);
+    res.status(500).json({ error: 'Не удалось убрать тег со статьи.' });
   }
 }

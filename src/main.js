@@ -143,7 +143,7 @@ function updateAuthArea(user) {
   area.innerHTML = user
     ? `
       <span class="user-name">${user.name}</span>
-      ${isAdmin ? '<button class="auth-button" data-admin-panel>Админ</button>' : ''}
+      ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Админ</a>' : ''}
       <button class="auth-button" data-auth-logout>Выйти</button>
     `
     : '<button class="auth-button" data-auth="login">Войти</button><button class="auth-button auth-button-primary" data-auth="register">Регистрация</button>';
@@ -162,8 +162,9 @@ function updateAuthArea(user) {
     }
   });
 
-  area.querySelector('[data-admin-panel]')?.addEventListener('click', () => {
-    layoutAdmin();
+  area.querySelector('[data-admin-panel]')?.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.location.hash = '#/admin';
   });
 }
 
@@ -255,7 +256,7 @@ async function layoutAdmin() {
               <input name="tag" placeholder="Название тега" required>
               <button type="submit">Добавить тег</button>
             </form>
-            <ul class="admin-list">${(tagsData.tags || []).map((tag) => `<li>${tag.name}</li>`).join('')}</ul>
+            <ul class="admin-list">${(tagsData.tags || []).map((tag) => `<li><span>${tag.name}</span><button class="tag-delete-button" type="button" data-delete-tag="${tag.id}" aria-label="Удалить тег ${tag.name}">×</button></li>`).join('')}</ul>
           </div>
 
           <div class="admin-card admin-wide">
@@ -265,7 +266,7 @@ async function layoutAdmin() {
                 <li>
                   <div>
                     <strong>${article.title}</strong>
-                    <span class="admin-article-tags">${(article.tags || []).join(', ') || 'Тегов пока нет'}</span>
+                    <span class="admin-article-tags">${(article.tags || []).length ? (article.tags || []).map((tag, index) => `<span class="admin-article-tag">${tag}<button class="tag-delete-button" type="button" data-delete-article-tag="${article.id}" data-tag-id="${article.tagIds[index]}">×</button></span>`).join('') : 'Тегов пока нет'}</span>
                   </div>
                   <form class="admin-tag-attach" data-article-id="${article.id}">
                     <select name="tag" required>
@@ -343,6 +344,28 @@ async function layoutAdmin() {
             method: 'POST',
             body: JSON.stringify({ tag })
           });
+          layoutAdmin();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-delete-article-tag]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try {
+          await fetchJson(`/api/admin/articles/${button.dataset.deleteArticleTag}/tags/${button.dataset.tagId}`, { method: 'DELETE' });
+          layoutAdmin();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-delete-tag]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        try {
+          await fetchJson(`/api/admin/tags/${button.dataset.deleteTag}`, { method: 'DELETE' });
           layoutAdmin();
         } catch (error) {
           alert(error.message);
@@ -466,6 +489,11 @@ function articlePage(key) {
 async function render() {
   await loadArticles();
   const path = window.location.hash.replace('#', '') || '/';
+  if (path === '/admin') {
+    await layoutAdmin();
+    window.scrollTo(0, 0);
+    return;
+  }
   const match = path.match(/^\/article\/([^/]+)$/);
   match ? articlePage(match[1]) : home();
   window.scrollTo(0, 0);

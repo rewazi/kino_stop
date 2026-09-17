@@ -47,11 +47,13 @@ footer { display: flex; justify-content: space-between; padding: 25px 5vw; color
 .admin-form textarea { min-height: 120px; resize: vertical; }
 .admin-form button, .admin-comments-list button { border: 0; background: var(--red); color: white; cursor: pointer; padding: 12px 16px; font: 11px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
 .admin-list { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.admin-list li { padding: 8px 10px; background: rgba(198,75,50,.08); color: var(--ink); font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.admin-list li { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(198,75,50,.08); color: var(--ink); font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.tag-delete-button { border: 0; padding: 0; background: transparent; color: var(--red); cursor: pointer; font: 16px/1 'Manrope', sans-serif; }
 .admin-articles-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 16px; }
 .admin-articles-list li { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
 .admin-articles-list li > div { display: grid; gap: 6px; }
-.admin-article-tags { color: var(--muted); font: 10px 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
+.admin-article-tags { display: flex; flex-wrap: wrap; gap: 8px; color: var(--muted); font: 10px 'DM Mono', monospace; letter-spacing: .06em; text-transform: uppercase; }
+.admin-article-tag { display: inline-flex; align-items: center; gap: 5px; padding: 5px 7px; border: 1px solid var(--line); }
 .admin-tag-attach { display: flex; gap: 10px; flex-wrap: wrap; }
 .admin-tag-attach select { flex: 1 1 220px; border: 1px solid var(--line); background: rgba(255,255,255,.35); padding: 12px 14px; font: 14px 'Manrope', sans-serif; color: var(--ink); }
 .admin-comments-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
