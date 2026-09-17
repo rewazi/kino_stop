@@ -91,6 +91,32 @@ export async function adminArticlesHandler(req, res) {
       res.status(500).json({ error: 'Не удалось сохранить статью.' });
     }
   }
+
+  if (req.method === 'PUT') {
+    const articleId = Number(req.params.id);
+    const title = String(req.body.title || '').trim();
+    const body = Array.isArray(req.body.body) ? req.body.body.map((paragraph) => String(paragraph).trim()).filter(Boolean) : [];
+
+    if (!articleId || !title || body.length === 0) {
+      return res.status(422).json({ error: 'Укажите название и содержимое статьи.' });
+    }
+
+    try {
+      const [result] = await pool.execute(
+        'UPDATE articles SET title = ?, body = ? WHERE id = ?',
+        [title, JSON.stringify(body), articleId]
+      );
+
+      if (!result.affectedRows) {
+        return res.status(404).json({ error: 'Статья не найдена.' });
+      }
+
+      res.json({ success: true, message: 'Статья обновлена.' });
+    } catch (error) {
+      console.error('Ошибка обновления статьи:', error);
+      res.status(500).json({ error: 'Не удалось обновить статью.' });
+    }
+  }
 }
 
 export async function adminCommentsHandler(req, res) {

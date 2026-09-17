@@ -99,8 +99,8 @@ async function authRequest(file, options = {}) {
   return data;
 }
 
-async function loadArticles() {
-  if (articlesLoaded) return;
+async function loadArticles(force = false) {
+  if (articlesLoaded && !force) return;
 
   try {
     const data = await fetchJson('/api/articles');
@@ -268,10 +268,15 @@ async function layoutAdmin() {
                     <strong>${article.title}</strong>
                     <span class="admin-article-tags">${(article.tags || []).length ? (article.tags || []).map((tag, index) => `<span class="admin-article-tag">${tag}<button class="tag-delete-button" type="button" data-delete-article-tag="${article.id}" data-tag-id="${article.tagIds[index]}">×</button></span>`).join('') : 'Тегов пока нет'}</span>
                   </div>
+                  <form class="admin-form admin-article-edit" data-edit-article-id="${article.id}">
+                    <input name="title" value="${article.title}" placeholder="Название статьи" required>
+                    <textarea name="body" placeholder="Параграфы через новую строку" required>${(article.body || []).join('\n')}</textarea>
+                    <button type="submit">Сохранить изменения</button>
+                  </form>
                   <form class="admin-tag-attach" data-article-id="${article.id}">
                     <select name="tag" required>
                       <option value="">Выберите тег</option>
-                      ${(tagsData.tags || []).map((tag) => `<option value="${tag.name}">${tag.name}</option>`).join('')}
+                      ${(tagsData.tags || []).filter((tag) => !(article.tags || []).includes(tag.name)).map((tag) => `<option value="${tag.name}">${tag.name}</option>`).join('')}
                     </select>
                     <button type="submit">Добавить тег</button>
                   </form>
@@ -343,6 +348,23 @@ async function layoutAdmin() {
           await fetchJson(`/api/admin/articles/${form.dataset.articleId}/tags`, {
             method: 'POST',
             body: JSON.stringify({ tag })
+          });
+          layoutAdmin();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-edit-article-id]').forEach((form) => {
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        const body = data.body.split('\n').map((line) => line.trim()).filter(Boolean);
+        try {
+          await fetchJson(`/api/admin/articles/${form.dataset.editArticleId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ title: data.title, body })
           });
           layoutAdmin();
         } catch (error) {
@@ -487,7 +509,7 @@ function articlePage(key) {
 }
 
 async function render() {
-  await loadArticles();
+  await loadArticles(true);
   const path = window.location.hash.replace('#', '') || '/';
   if (path === '/admin') {
     await layoutAdmin();

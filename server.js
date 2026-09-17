@@ -42,6 +42,7 @@ app.get('/api/articles', getArticlesHandler);
 
 app.get('/api/admin/articles', adminArticlesHandler);
 app.post('/api/admin/articles', adminArticlesHandler);
+app.put('/api/admin/articles/:id', adminArticlesHandler);
 app.get('/api/admin/comments', adminCommentsHandler);
 app.delete('/api/admin/comments/:id', adminDeleteCommentHandler);
 app.get('/api/admin/tags', adminTagsHandler);
