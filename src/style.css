@@ -36,6 +36,21 @@ footer { display: flex; justify-content: space-between; padding: 25px 5vw; color
 .article-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .tag-chip { display: inline-flex; align-items: center; padding: 7px 10px; border: 1px solid var(--line); background: rgba(255,255,255,.4); color: var(--ink); font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
 .article-tags-large { margin: 18px 0 20px; }
+.tags-page { padding: 80px 12vw 110px; }
+.tags-page-header { max-width: 720px; }
+.tags-page-header h1 { font: 500 clamp(54px, 8vw, 104px)/.95 'Playfair Display', serif; margin: 0; }
+.tags-page-header h1 em { color: var(--red); }
+.tags-page-header > p:last-child { max-width: 470px; color: var(--muted); line-height: 1.7; margin: 28px 0 0; }
+.tag-filter-list { display: flex; flex-wrap: wrap; gap: 10px; margin: 55px 0 35px; }
+.tag-filter { border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; padding: 10px 13px; font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+.tag-filter:hover, .tag-filter.active { border-color: var(--red); background: var(--red); color: white; }
+.tag-results { display: grid; gap: 0; max-width: 900px; }
+.tag-result { position: relative; display: block; padding: 28px 45px 28px 0; border-top: 1px solid var(--line); }
+.tag-result:hover h2 { color: var(--red); }
+.tag-result h2 { font: 500 34px 'Playfair Display', serif; margin: 8px 0; transition: color .2s; }
+.tag-result p { max-width: 620px; color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0; }
+.tag-result .arrow { position: absolute; top: 28px; right: 0; }
+.tag-empty { color: var(--muted); }
 .admin-panel { padding: 64px 12vw 80px; }
 .admin-header h1 { font: 500 48px/1 'Playfair Display', serif; margin: 0 0 32px; }
 .admin-sections { display: grid; grid-template-columns: repeat(2, minmax(280px, 1fr)); gap: 24px; }

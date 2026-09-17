@@ -95,16 +95,17 @@ export async function adminArticlesHandler(req, res) {
   if (req.method === 'PUT') {
     const articleId = Number(req.params.id);
     const title = String(req.body.title || '').trim();
+    const fact = String(req.body.fact || '').trim();
     const body = Array.isArray(req.body.body) ? req.body.body.map((paragraph) => String(paragraph).trim()).filter(Boolean) : [];
 
-    if (!articleId || !title || body.length === 0) {
-      return res.status(422).json({ error: 'Укажите название и содержимое статьи.' });
+    if (!articleId || !title || !fact || body.length === 0) {
+      return res.status(422).json({ error: 'Укажите название, содержимое и заметку статьи.' });
     }
 
     try {
       const [result] = await pool.execute(
-        'UPDATE articles SET title = ?, body = ? WHERE id = ?',
-        [title, JSON.stringify(body), articleId]
+        'UPDATE articles SET title = ?, body = ?, fact = ? WHERE id = ?',
+        [title, JSON.stringify(body), fact, articleId]
       );
 
       if (!result.affectedRows) {

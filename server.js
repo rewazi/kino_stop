@@ -2,6 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import { meHandler } from './api/me.js';
 import { registerHandler } from './api/register.js';
 import { loginHandler } from './api/login.js';
@@ -11,7 +12,7 @@ import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, 
 import { initializeDatabase } from './api/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const app = express();
+export const app = express();
 const port = Number(process.env.PORT || 3000);
 
 app.use(express.json());
@@ -57,7 +58,7 @@ app.use((req, res, next) => {
   next();
 });
 
-async function startServer() {
+export async function startServer() {
   try {
     await initializeDatabase();
     app.listen(port, () => console.log(`Киносфера запущена: http://localhost:${port}`));
@@ -67,4 +68,5 @@ async function startServer() {
   }
 }
 
-startServer();
+const isDirectRun = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
+if (isDirectRun) startServer();

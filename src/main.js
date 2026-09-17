@@ -50,6 +50,7 @@ const nav = `
       <a href="#/article/silent" data-route="silent">Немое кино</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Новая волна</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Блокбастеры</a>
+      <a href="#/tags" data-route="tags">Теги</a>
     </nav>
     <div class="auth-area" data-auth-area><button class="auth-button" data-auth="login">Войти</button><button class="auth-button auth-button-primary" data-auth="register">Регистрация</button></div>
   </header>`;
@@ -213,6 +214,44 @@ function home() {
   `);
 }
 
+function tagsPage() {
+  const allTags = [...new Set(Object.values(articleStore).flatMap((article) => article.tags || []))].sort((first, second) => first.localeCompare(second, 'ru'));
+
+  layout(`
+    <section class="tags-page">
+      <div class="tags-page-header reveal">
+        <p class="eyebrow">Навигация по архиву</p>
+        <h1>Найти статью<br><em>по тегу.</em></h1>
+        <p>Выберите тему, чтобы оставить на странице только связанные с ней материалы.</p>
+      </div>
+      <div class="tag-filter-list" data-tag-filters>
+        <button class="tag-filter active" type="button" data-tag-filter="">Все статьи</button>
+        ${allTags.map((tag) => `<button class="tag-filter" type="button" data-tag-filter="${tag}">${tag}</button>`).join('')}
+      </div>
+      <div class="tag-results" data-tag-results></div>
+    </section>
+  `, 'tags');
+
+  const results = document.querySelector('[data-tag-results]');
+  const filters = document.querySelectorAll('[data-tag-filter]');
+
+  const renderResults = (selectedTag = '') => {
+    const matchingArticles = Object.entries(articleStore).filter(([, article]) => !selectedTag || (article.tags || []).includes(selectedTag));
+    results.innerHTML = matchingArticles.length
+      ? matchingArticles.map(([key, article]) => `<a class="tag-result reveal" href="#/article/${key}"><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></a>`).join('')
+      : '<p class="tag-empty">Статей с таким тегом пока нет.</p>';
+  };
+
+  filters.forEach((filter) => {
+    filter.addEventListener('click', () => {
+      filters.forEach((item) => item.classList.toggle('active', item === filter));
+      renderResults(filter.dataset.tagFilter);
+    });
+  });
+
+  renderResults();
+}
+
 async function layoutAdmin() {
   if (!currentUser || currentUser.role !== 'admin') {
     openAuth('login');
@@ -271,6 +310,7 @@ async function layoutAdmin() {
                   <form class="admin-form admin-article-edit" data-edit-article-id="${article.id}">
                     <input name="title" value="${article.title}" placeholder="Название статьи" required>
                     <textarea name="body" placeholder="Параграфы через новую строку" required>${(article.body || []).join('\n')}</textarea>
+                    <textarea name="fact" placeholder="Заметка из архива" required>${article.fact || ''}</textarea>
                     <button type="submit">Сохранить изменения</button>
                   </form>
                   <form class="admin-tag-attach" data-article-id="${article.id}">
@@ -364,7 +404,7 @@ async function layoutAdmin() {
         try {
           await fetchJson(`/api/admin/articles/${form.dataset.editArticleId}`, {
             method: 'PUT',
-            body: JSON.stringify({ title: data.title, body })
+            body: JSON.stringify({ title: data.title, body, fact: data.fact })
           });
           layoutAdmin();
         } catch (error) {
@@ -513,6 +553,11 @@ async function render() {
   const path = window.location.hash.replace('#', '') || '/';
   if (path === '/admin') {
     await layoutAdmin();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (path === '/tags') {
+    tagsPage();
     window.scrollTo(0, 0);
     return;
   }
