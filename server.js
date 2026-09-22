@@ -7,7 +7,7 @@ import { meHandler } from './api/me.js';
 import { registerHandler } from './api/register.js';
 import { loginHandler } from './api/login.js';
 import { logoutHandler } from './api/logout.js';
-import { getCommentsHandler, createCommentHandler } from './api/comments.js';
+import { getCommentsHandler, createCommentHandler, updateOwnCommentHandler, deleteOwnCommentHandler } from './api/comments.js';
 import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminDeleteTagHandler, adminArticleTagsHandler, adminDeleteArticleTagHandler, getArticlesHandler } from './api/admin.js';
 import { initializeDatabase } from './api/config.js';
 
@@ -17,7 +17,7 @@ const port = Number(process.env.PORT || 3000);
 
 app.use(express.json());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'kinosfera-development-secret',
+  secret: process.env.SESSION_SECRET || 'filmisfaar-development-secret',
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -39,6 +39,10 @@ for (const [name, handler] of Object.entries(authHandlers)) {
 
 app.get('/api/comments/:articleKey', getCommentsHandler);
 app.post('/api/comments/:articleKey', createCommentHandler);
+// UUS FUNKTSIONAALSUS 3: kasutaja saab muuta ja kustutada enda kommentaari
+app.put('/api/comments/entry/:id', updateOwnCommentHandler);
+app.delete('/api/comments/entry/:id', deleteOwnCommentHandler);
+// UUS FUNKTSIONAALSUS 2: /api/articles toetab nüüd ?tag= ja ?q= otsinguparameetreid (vt api/admin.js)
 app.get('/api/articles', getArticlesHandler);
 
 app.get('/api/admin/articles', adminArticlesHandler);
@@ -61,9 +65,9 @@ app.use((req, res, next) => {
 export async function startServer() {
   try {
     await initializeDatabase();
-    app.listen(port, () => console.log(`Киносфера запущена: http://localhost:${port}`));
+    app.listen(port, () => console.log(`Filmisfäär käivitatud: http://localhost:${port}`));
   } catch (error) {
-    console.error('Не удалось инициализировать базу данных:', error.message);
+    console.error('Andmebaasi ei õnnestunud lähtestada:', error.message);
     process.exit(1);
   }
 }

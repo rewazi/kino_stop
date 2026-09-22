@@ -2,73 +2,73 @@ import './style.css';
 
 const articles = {
   silent: {
-    section: '01 / Истоки',
-    title: 'Когда кадр научился дышать',
-    subtitle: 'Немое кино не было безмолвным. Оно говорило монтажом, жестом и светом — и придумало грамматику, которой мы пользуемся до сих пор.',
+    section: '01 / Algused',
+    title: 'Kui kaader õppis hingama',
+    subtitle: 'Tummfilm ei olnud hääletu. Ta rääkis montaaži, žesti ja valgusega — ja lõi grammatika, mida kasutame tänaseni.',
     year: '1895—1927',
     image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1800&q=85',
-    tags: ['немое кино', 'монтаж', 'первые кадры'],
+    tags: ['tummfilm', 'montaaž', 'esimesed kaadrid'],
     body: [
-      'Первые показы братьев Люмьер были короткими зарисовками, но зритель сразу увидел в них не просто технический аттракцион, а новый способ смотреть на реальность. Поезд, прибывающий на вокзал, был событием именно потому, что двигался внутри рамки.',
-      'Вскоре кино вышло за пределы фиксации. Жорж Мельес превратил камеру в сцену для иллюзий, а Дэвид Уорк Гриффит и Сергей Эйзенштейн начали собирать эмоцию из соседства планов. Монтаж стал не склейкой, а мыслью.'
+      'Lumière’i vendade esimesed seansid olid lühikesed visandid, kuid vaataja nägi neis kohe midagi enamat kui tehnilist atraktsiooni — uut viisi maailma vaadata. Rongi saabumine jaama oli sündmus just seepärast, et see liikus kaadri sees.',
+      'Peagi läks film kaugemale pelgast jäädvustamisest. Georges Méliès muutis kaamera illusioonide lavaks, D. W. Griffith ja Sergei Eisenstein aga hakkasid emotsiooni kokku panema kaadrite kõrvutamisest. Montaažist sai mitte lihtsalt liitmine, vaid mõte.'
     ],
-    fact: 'Первый публичный киносеанс братьев Люмьер состоялся в Париже 28 декабря 1895 года.'
+    fact: 'Lumière’i vendade esimene avalik filmiseanss toimus Pariisis 28. detsembril 1895.'
   },
   nouvelle: {
-    section: '02 / Свобода взгляда',
-    title: 'Камера выходит на улицу',
-    subtitle: 'Французская новая волна отказалась от гладкости студийного кино и вернула фильму нерв живого разговора.',
+    section: '02 / Vaate vabadus',
+    title: 'Kaamera läheb tänavale',
+    subtitle: 'Prantsuse uus laine loobus stuudiofilmi siledusest ja tõi filmi tagasi elava vestluse närvi.',
     year: '1958—1968',
     image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1800&q=85',
-    tags: ['новая волна', 'Париж', 'свобода формы'],
+    tags: ['uus laine', 'Pariis', 'vormi vabadus'],
     body: [
-      'В конце 1950-х молодые критики журнала Cahiers du Cinéma стали режиссёрами. Жан-Люк Годар, Франсуа Трюффо, Аньес Варда и их коллеги снимали там, где была жизнь: в квартирах, кафе, на улицах Парижа.',
-      'Их фильмы позволяли себе сбиваться, смотреть в объектив и оставлять монтажные швы видимыми. Новая волна напомнила: кино может быть не только иллюзией, но и личным высказыванием — лёгким, дерзким, несовершенным.'
+      '1950. aastate lõpus said ajakirja Cahiers du Cinéma noortest kriitikutest režissöörid. Jean-Luc Godard, François Truffaut, Agnès Varda ja nende kolleegid filmisid seal, kus oli elu: korterites, kohvikutes, Pariisi tänavatel.',
+      'Nende filmid lubasid endale eksimusi, vaatasid otse objektiivi ega peitnud montaažiõmblusi. Uus laine tuletas meelde: film võib olla mitte ainult illusioon, vaid ka isiklik sõnavõtt — kerge, julge, ebatäiuslik.'
     ],
-    fact: '«На последнем дыхании» Годара прославил резкие склейки, позже названные jump cut.'
+    fact: 'Godard’i „Hingeldades“ tegi kuulsaks järsud katked, mida hakati nimetama jump cut’iks.'
   },
   blockbuster: {
-    section: '03 / Большой экран',
-    title: 'Как лето стало премьерой',
-    subtitle: 'Блокбастер превратил поход в кино в коллективный ритуал, а маркетинг — в часть самого зрелища.',
+    section: '03 / Suur ekraan',
+    title: 'Kuidas suvest sai esilinastus',
+    subtitle: 'Põnevik-hitt muutis kinoskäigu kollektiivseks rituaaliks, turundusest aga sai osa vaatemängust endast.',
     year: '1975—1999',
     image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1800&q=85',
-    tags: ['блокбастеры', 'прокат', 'медиафраншизы'],
+    tags: ['põnevik-hitid', 'kinolevi', 'meediafrantsiisid'],
     body: [
-      '«Челюсти» Стивена Спилберга стали первым настоящим летним блокбастером: фильм одновременно захватил экраны, разговоры и рекламные каналы. Через два года «Звёздные войны» доказали, что вселенная может продолжаться за пределами финальных титров.',
-      'В эти десятилетия студии научились мыслить событием. Постер, трейлер, игрушка, саундтрек и сам фильм складывались в единый культурный опыт. Большой экран стал местом, где зрители приходили не только за историей, но и за масштабом.'
+      'Steven Spielbergi „Lõuad“ said esimeseks tõeliseks suveblokbasteriks: film vallutas korraga ekraanid, vestlused ja reklaamikanalid. Kaks aastat hiljem tõestas „Tähesõjad“, et universum võib jätkuda ka lõputiitrite järel.',
+      'Neil kümnenditel õppisid stuudiod mõtlema sündmustena. Poster, treiler, mänguasi, saundtrack ja film ise moodustasid ühtse kultuurikogemuse. Suurest ekraanist sai koht, kuhu tuldi mitte ainult loo, vaid ka mastaabi pärast.'
     ],
-    fact: '«Челюсти» 1975 года первыми собрали более 100 миллионов долларов в прокате США.'
+    fact: 'Aasta 1975 „Lõuad“ olid esimene film, mis kogus USA kinolevis üle 100 miljoni dollari.'
   }
 };
 
 const nav = `
   <header class="site-header">
-    <a class="brand" href="#/">КИНО<span>СФЕРА</span></a>
-    <nav class="main-nav" aria-label="Основная навигация">
-      <a href="#/" data-route="home">Хроника</a>
-      <a href="#/article/silent" data-route="silent">Немое кино</a>
-      <a href="#/article/nouvelle" data-route="nouvelle">Новая волна</a>
-      <a href="#/article/blockbuster" data-route="blockbuster">Блокбастеры</a>
-      <a href="#/tags" data-route="tags">Теги</a>
+    <a class="brand" href="#/">FILMI<span>SFÄÄR</span></a>
+    <nav class="main-nav" aria-label="Peamine navigatsioon">
+      <a href="#/" data-route="home">Ajajoon</a>
+      <a href="#/article/silent" data-route="silent">Tummfilm</a>
+      <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
+      <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
+      <a href="#/tags" data-route="tags">Sildid</a>
     </nav>
-    <div class="auth-area" data-auth-area><button class="auth-button" data-auth="login">Войти</button><button class="auth-button auth-button-primary" data-auth="register">Регистрация</button></div>
+    <div class="auth-area" data-auth-area><button class="auth-button" data-auth="login">Logi sisse</button><button class="auth-button auth-button-primary" data-auth="register">Registreeru</button></div>
   </header>`;
 
 const authModal = `
   <div class="auth-modal" data-auth-modal hidden>
     <div class="auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-      <button class="auth-close" type="button" data-auth-close aria-label="Закрыть">×</button>
-      <p class="eyebrow">Личный архив</p>
-      <h2 id="auth-title" data-auth-title>Вход в аккаунт</h2>
+      <button class="auth-close" type="button" data-auth-close aria-label="Sulge">×</button>
+      <p class="eyebrow">Isiklik arhiiv</p>
+      <h2 id="auth-title" data-auth-title>Sisselogimine</h2>
       <form data-auth-form>
-        <label data-name-field hidden>Имя<input type="text" name="name" autocomplete="name"></label>
-        <label>Email<input type="email" name="email" autocomplete="email" required></label>
-        <label>Пароль<input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
+        <label data-name-field hidden>Nimi<input type="text" name="name" autocomplete="name"></label>
+        <label>E-post<input type="email" name="email" autocomplete="email" required></label>
+        <label>Parool<input type="password" name="password" autocomplete="current-password" minlength="6" required></label>
         <p class="auth-error" data-auth-error role="alert"></p>
-        <button class="auth-submit" type="submit" data-auth-submit>Войти <span>↗</span></button>
+        <button class="auth-submit" type="submit" data-auth-submit>Logi sisse <span>↗</span></button>
       </form>
-      <button class="auth-switch" type="button" data-auth-switch>Нет аккаунта? Зарегистрироваться</button>
+      <button class="auth-switch" type="button" data-auth-switch>Pole kontot? Registreeru</button>
     </div>
   </div>`;
 
@@ -85,7 +85,7 @@ async function fetchJson(url, options = {}) {
     ...options
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Не удалось выполнить запрос.');
+  if (!response.ok) throw new Error(data.error || 'Päringu täitmine ebaõnnestus.');
   return data;
 }
 
@@ -96,7 +96,7 @@ async function authRequest(file, options = {}) {
     ...options
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || 'Не удалось выполнить запрос.');
+  if (!response.ok) throw new Error(data.error || 'Päringu täitmine ebaõnnestus.');
   return data;
 }
 
@@ -108,9 +108,31 @@ async function loadArticles(force = false) {
     const databaseArticles = Object.fromEntries((data.articles || []).map((article) => [article.slug, article]));
     articleStore = { ...articleStore, ...databaseArticles };
   } catch {
-    // Static articles remain available when the database is temporarily unavailable.
+    // Staatilised artiklid jäävad kättesaadavaks, kui andmebaas on ajutiselt saadaval.
   } finally {
     articlesLoaded = true;
+  }
+}
+
+// --- UUS FUNKTSIONAALSUS 2: artiklite otsimine märksõna järgi (kasutab /api/articles?q=) ---
+async function searchArticles(query) {
+  if (!query) return Object.entries(articleStore);
+  try {
+    const data = await fetchJson(`/api/articles?q=${encodeURIComponent(query)}`);
+    const remoteMatches = data.articles || [];
+    const remoteSlugSet = new Set(remoteMatches.map((article) => article.slug));
+    const localMatches = Object.entries(articles).filter(([slug, article]) =>
+      !remoteSlugSet.has(slug) && (
+        article.title.toLowerCase().includes(query.toLowerCase()) ||
+        article.subtitle.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+    return [...remoteMatches.map((article) => [article.slug, article]), ...localMatches];
+  } catch {
+    const lowered = query.toLowerCase();
+    return Object.entries(articleStore).filter(([, article]) =>
+      article.title.toLowerCase().includes(lowered) || article.subtitle.toLowerCase().includes(lowered)
+    );
   }
 }
 
@@ -119,11 +141,11 @@ function setAuthMode(mode) {
   const modal = document.querySelector('[data-auth-modal]');
   if (!modal) return;
   const isRegister = mode === 'register';
-  modal.querySelector('[data-auth-title]').textContent = isRegister ? 'Создать аккаунт' : 'Вход в аккаунт';
+  modal.querySelector('[data-auth-title]').textContent = isRegister ? 'Loo konto' : 'Sisselogimine';
   modal.querySelector('[data-name-field]').hidden = !isRegister;
   modal.querySelector('[data-name-field] input').required = isRegister;
-  modal.querySelector('[data-auth-submit]').innerHTML = `${isRegister ? 'Зарегистрироваться' : 'Войти'} <span>↗</span>`;
-  modal.querySelector('[data-auth-switch]').textContent = isRegister ? 'Уже есть аккаунт? Войти' : 'Нет аккаунта? Зарегистрироваться';
+  modal.querySelector('[data-auth-submit]').innerHTML = `${isRegister ? 'Registreeru' : 'Logi sisse'} <span>↗</span>`;
+  modal.querySelector('[data-auth-switch]').textContent = isRegister ? 'Juba on konto? Logi sisse' : 'Pole kontot? Registreeru';
   modal.querySelector('[data-auth-error]').textContent = '';
 }
 
@@ -144,10 +166,10 @@ function updateAuthArea(user) {
   area.innerHTML = user
     ? `
       <span class="user-name">${user.name}</span>
-      ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Админ</a>' : ''}
-      <button class="auth-button" data-auth-logout>Выйти</button>
+      ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Admin</a>' : ''}
+      <button class="auth-button" data-auth-logout>Logi välja</button>
     `
-    : '<button class="auth-button" data-auth="login">Войти</button><button class="auth-button auth-button-primary" data-auth="register">Регистрация</button>';
+    : '<button class="auth-button" data-auth="login">Logi sisse</button><button class="auth-button auth-button-primary" data-auth="register">Registreeru</button>';
 
   area.querySelectorAll('[data-auth]').forEach((button) => button.addEventListener('click', () => openAuth(button.dataset.auth)));
   area.querySelector('[data-auth-logout]')?.addEventListener('click', async () => {
@@ -198,7 +220,7 @@ function bindAuth() {
 }
 
 function layout(content, route = 'home') {
-  document.querySelector('#app').innerHTML = `${nav}<main>${content}</main><footer><span>КИНОСФЕРА / 001</span><span>История кино — это история взгляда</span></footer>${authModal}`;
+  document.querySelector('#app').innerHTML = `${nav}<main>${content}</main><footer><span>FILMISFÄÄR / 001</span><span>Kino ajalugu on pilgu ajalugu</span></footer>${authModal}`;
   document.querySelectorAll('[data-route]').forEach((link) => link.classList.toggle('active', link.dataset.route === route));
   bindAuth();
 }
@@ -206,26 +228,27 @@ function layout(content, route = 'home') {
 function home() {
   layout(`
     <section class="hero">
-      <div class="hero-copy reveal"><p class="eyebrow">Визуальная история / 1895—сегодня</p><h1>Кино — это<br><em>память</em> в движении.</h1><p class="hero-lead">Путешествие по эпохам, которые научили нас видеть больше, чем помещается в одном кадре.</p><a class="text-link" href="#/article/silent">Начать путешествие <span>↗</span></a></div>
+      <div class="hero-copy reveal"><p class="eyebrow">Visuaalne ajalugu / 1895–tänapäevani</p><h1>Film on<br><em>mälu</em> liikumises.</h1><p class="hero-lead">Teekond ajastute vahel, mis õpetasid meid nägema rohkem, kui mahub ühte kaadrisse.</p><a class="text-link" href="#/article/silent">Alusta teekonda <span>↗</span></a></div>
       <div class="hero-poster reveal"><div class="poster-image"></div><div class="poster-label"><span>THE</span><strong>SEVENTH<br>SENSE</strong><small>Frames from a century</small></div><span class="poster-year">1895</span></div>
     </section>
-    <section class="intro-band"><p class="section-kicker">Три поворотных момента</p><p class="intro-text">От первого мерцания плёнки до цифровых миров — кино каждый раз меняло не только экран, но и нас.</p></section>
+    <section class="intro-band"><p class="section-kicker">Kolm pöördelist hetke</p><p class="intro-text">Esimesest filmilindi virvendusest digitaalsete maailmadeni — kino on iga kord muutnud mitte ainult ekraani, vaid ka meid.</p></section>
     <section class="timeline-preview"><div class="timeline-line"></div>${Object.entries(articleStore).map(([key, article], index) => `<a class="timeline-card reveal" href="#/article/${key}"><span class="card-index">${String(index + 1).padStart(2, '0')}</span><div><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></div></a>`).join('')}</section>
   `);
 }
 
 function tagsPage() {
-  const allTags = [...new Set(Object.values(articleStore).flatMap((article) => article.tags || []))].sort((first, second) => first.localeCompare(second, 'ru'));
+  const allTags = [...new Set(Object.values(articleStore).flatMap((article) => article.tags || []))].sort((first, second) => first.localeCompare(second, 'et'));
 
   layout(`
     <section class="tags-page">
       <div class="tags-page-header reveal">
-        <p class="eyebrow">Навигация по архиву</p>
-        <h1>Найти статью<br><em>по тегу.</em></h1>
-        <p>Выберите тему, чтобы оставить на странице только связанные с ней материалы.</p>
+        <p class="eyebrow">Liikumine arhiivis</p>
+        <h1>Leia artikkel<br><em>sildi järgi.</em></h1>
+        <p>Vali teema, et jätta lehele ainult sellega seotud materjalid.</p>
       </div>
+      <input class="tag-search" type="search" data-tag-search placeholder="Otsi märksõna järgi...">
       <div class="tag-filter-list" data-tag-filters>
-        <button class="tag-filter active" type="button" data-tag-filter="">Все статьи</button>
+        <button class="tag-filter active" type="button" data-tag-filter="">Kõik artiklid</button>
         ${allTags.map((tag) => `<button class="tag-filter" type="button" data-tag-filter="${tag}">${tag}</button>`).join('')}
       </div>
       <div class="tag-results" data-tag-results></div>
@@ -234,19 +257,36 @@ function tagsPage() {
 
   const results = document.querySelector('[data-tag-results]');
   const filters = document.querySelectorAll('[data-tag-filter]');
+  const searchInput = document.querySelector('[data-tag-search]');
+
+  const renderList = (entries) => {
+    results.innerHTML = entries.length
+      ? entries.map(([key, article]) => `<a class="tag-result reveal" href="#/article/${key}"><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></a>`).join('')
+      : '<p class="tag-empty">Selle sildiga (või otsingusõnaga) artikleid veel ei ole.</p>';
+  };
 
   const renderResults = (selectedTag = '') => {
     const matchingArticles = Object.entries(articleStore).filter(([, article]) => !selectedTag || (article.tags || []).includes(selectedTag));
-    results.innerHTML = matchingArticles.length
-      ? matchingArticles.map(([key, article]) => `<a class="tag-result reveal" href="#/article/${key}"><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></a>`).join('')
-      : '<p class="tag-empty">Статей с таким тегом пока нет.</p>';
+    renderList(matchingArticles);
   };
 
   filters.forEach((filter) => {
     filter.addEventListener('click', () => {
       filters.forEach((item) => item.classList.toggle('active', item === filter));
+      searchInput.value = '';
       renderResults(filter.dataset.tagFilter);
     });
+  });
+
+  let searchTimeout;
+  searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(async () => {
+      const query = searchInput.value.trim();
+      if (!query) return renderResults('');
+      filters.forEach((item) => item.classList.remove('active'));
+      renderList(await searchArticles(query));
+    }, 250);
   });
 
   renderResults();
@@ -268,77 +308,77 @@ async function layoutAdmin() {
     const content = `
       <section class="admin-panel">
         <div class="admin-header">
-          <p class="eyebrow">Администратор</p>
-          <h1>Панель управления</h1>
+          <p class="eyebrow">Administraator</p>
+          <h1>Halduspaneel</h1>
         </div>
 
         <div class="admin-sections">
           <div class="admin-card">
-            <h2>Добавить статью</h2>
+            <h2>Lisa artikkel</h2>
             <form class="admin-form" data-admin-article-form>
-              <input name="slug" placeholder="slug (например, silent)" required>
-              <input name="section" placeholder="Раздел" required>
-              <input name="title" placeholder="Название статьи" required>
-              <textarea name="subtitle" placeholder="Короткое описание" required></textarea>
-              <input name="year" placeholder="Годы" required>
-              <input name="image" placeholder="URL изображения" required>
-              <textarea name="fact" placeholder="Факт из архива" required></textarea>
-              <textarea name="body" placeholder="Параграфы через новую строку" required></textarea>
-              <input name="tags" placeholder="Теги через запятую (например: история, монтаж)">
-              <button type="submit">Сохранить статью</button>
+              <input name="slug" placeholder="slug (nt silent)" required>
+              <input name="section" placeholder="Osa" required>
+              <input name="title" placeholder="Artikli pealkiri" required>
+              <textarea name="subtitle" placeholder="Lühikirjeldus" required></textarea>
+              <input name="year" placeholder="Aastad" required>
+              <input name="image" placeholder="Pildi URL" required>
+              <textarea name="fact" placeholder="Fakt arhiivist" required></textarea>
+              <textarea name="body" placeholder="Lõigud, iga uuel real" required></textarea>
+              <input name="tags" placeholder="Sildid komadega eraldatult (nt: ajalugu, montaaž)">
+              <button type="submit">Salvesta artikkel</button>
             </form>
           </div>
 
           <div class="admin-card">
-            <h2>Теги</h2>
+            <h2>Sildid</h2>
             <form class="admin-form" data-admin-tag-form>
-              <input name="tag" placeholder="Название тега" required>
-              <button type="submit">Добавить тег</button>
+              <input name="tag" placeholder="Sildi nimi" required>
+              <button type="submit">Lisa silt</button>
             </form>
-            <ul class="admin-list">${(tagsData.tags || []).map((tag) => `<li><span>${tag.name}</span><button class="tag-delete-button" type="button" data-delete-tag="${tag.id}" aria-label="Удалить тег ${tag.name}">×</button></li>`).join('')}</ul>
+            <ul class="admin-list">${(tagsData.tags || []).map((tag) => `<li><span>${tag.name}</span><button class="tag-delete-button" type="button" data-delete-tag="${tag.id}" aria-label="Kustuta silt ${tag.name}">×</button></li>`).join('')}</ul>
           </div>
 
           <div class="admin-card admin-wide">
-            <h2>Теги статей</h2>
+            <h2>Artiklite sildid</h2>
             <ul class="admin-articles-list">
               ${(articlesData.articles || []).map((article) => `
                 <li>
                   <div>
                     <strong>${article.title}</strong>
-                    <span class="admin-article-tags">${(article.tags || []).length ? (article.tags || []).map((tag, index) => `<span class="admin-article-tag">${tag}<button class="tag-delete-button" type="button" data-delete-article-tag="${article.id}" data-tag-id="${article.tagIds[index]}">×</button></span>`).join('') : 'Тегов пока нет'}</span>
+                    <span class="admin-article-tags">${(article.tags || []).length ? (article.tags || []).map((tag, index) => `<span class="admin-article-tag">${tag}<button class="tag-delete-button" type="button" data-delete-article-tag="${article.id}" data-tag-id="${article.tagIds[index]}">×</button></span>`).join('') : 'Silte pole veel'}</span>
                   </div>
                   <form class="admin-form admin-article-edit" data-edit-article-id="${article.id}">
-                    <input name="title" value="${article.title}" placeholder="Название статьи" required>
-                    <textarea name="body" placeholder="Параграфы через новую строку" required>${(article.body || []).join('\n')}</textarea>
-                    <textarea name="fact" placeholder="Заметка из архива" required>${article.fact || ''}</textarea>
-                    <button type="submit">Сохранить изменения</button>
+                    <input name="title" value="${article.title}" placeholder="Artikli pealkiri" required>
+                    <textarea name="body" placeholder="Lõigud, iga uuel real" required>${(article.body || []).join('\n')}</textarea>
+                    <textarea name="fact" placeholder="Märkus arhiivist" required>${article.fact || ''}</textarea>
+                    <button type="submit">Salvesta muudatused</button>
                   </form>
                   <form class="admin-tag-attach" data-article-id="${article.id}">
                     <select name="tag" required>
-                      <option value="">Выберите тег</option>
+                      <option value="">Vali silt</option>
                       ${(tagsData.tags || []).filter((tag) => !(article.tags || []).includes(tag.name)).map((tag) => `<option value="${tag.name}">${tag.name}</option>`).join('')}
                     </select>
-                    <button type="submit">Добавить тег</button>
+                    <button type="submit">Lisa silt</button>
                   </form>
                 </li>
-              `).join('') || '<li>Статей из базы пока нет.</li>'}
+              `).join('') || '<li>Andmebaasis pole veel artikleid.</li>'}
             </ul>
           </div>
 
           <div class="admin-card admin-wide">
-            <h2>Комментарии</h2>
+            <h2>Kommentaarid</h2>
             <ul class="admin-comments-list">
               ${(commentsData.comments || []).map((comment) => `
                 <li>
                   <div>
                     <strong>${comment.name}</strong>
                     <span>${comment.article_key}</span>
-                    <small>${new Date(comment.created_at).toLocaleString('ru-RU')}</small>
+                    <small>${new Date(comment.created_at).toLocaleString('et-EE')}</small>
                   </div>
                   <p>${comment.text}</p>
-                  <button data-delete-comment="${comment.id}">Удалить</button>
+                  <button data-delete-comment="${comment.id}">Kustuta</button>
                 </li>
-              `).join('') || '<li>Комментариев нет.</li>'}
+              `).join('') || '<li>Kommentaare pole.</li>'}
             </ul>
           </div>
         </div>
@@ -455,7 +495,7 @@ async function fetchComments(articleKey) {
   try {
     const response = await fetch(`/api/comments/${articleKey}`, { credentials: 'same-origin' });
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Не удалось загрузить комментарии.');
+    if (!response.ok) throw new Error(data.error || 'Kommentaaride laadimine ebaõnnestus.');
     return data.comments || [];
   } catch {
     return [];
@@ -473,48 +513,55 @@ async function renderCommentsFromState() {
   commentsRoot.innerHTML = `
     <div class="comments-block">
       <div class="comments-header">
-        <p class="eyebrow">Комментарии</p>
-        <span>${comments.length} ${comments.length === 1 ? 'комментарий' : comments.length < 5 ? 'комментария' : 'комментариев'}</span>
+        <p class="eyebrow">Kommentaarid</p>
+        <span>${comments.length} ${comments.length === 1 ? 'kommentaar' : 'kommentaari'}</span>
       </div>
       ${isLoggedIn ? `
         <form class="comment-form" data-comment-form>
-          <textarea name="text" maxlength="500" rows="4" placeholder="Напишите комментарий..." required></textarea>
+          <textarea name="text" maxlength="500" rows="4" placeholder="Kirjutage kommentaar..." required></textarea>
           <div class="comment-actions">
             <span class="comment-status" data-comment-status></span>
-            <button type="submit">Отправить</button>
+            <button type="submit">Saada</button>
           </div>
         </form>
       ` : `
-        <div class="comment-login-prompt">Только зарегистрированные пользователи могут оставлять комментарии.</div>
+        <div class="comment-login-prompt">Ainult registreeritud kasutajad saavad kommenteerida.</div>
       `}
       <div class="comments-list">
         ${comments.length
-          ? comments.map((comment) => `
-            <article class="comment-item">
-              <div class="comment-meta"><strong>${comment.name}</strong><time>${new Date(comment.created_at).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</time></div>
-              <p>${comment.text}</p>
+          ? comments.map((comment) => {
+            const isOwn = currentUser && comment.user_id === currentUser.id;
+            return `
+            <article class="comment-item" data-comment-id="${comment.id}">
+              <div class="comment-meta"><strong>${comment.name}</strong><time>${new Date(comment.created_at).toLocaleString('et-EE', { dateStyle: 'short', timeStyle: 'short' })}</time></div>
+              <p data-comment-text>${comment.text}</p>
+              ${isOwn ? `
+                <div class="comment-own-actions">
+                  <button type="button" data-comment-edit>Muuda</button>
+                  <button type="button" data-comment-delete>Kustuta</button>
+                </div>
+              ` : ''}
             </article>
-          `).join('')
-          : `<div class="comment-empty">Пока нет комментариев. Будьте первым.</div>`}
+          `;
+          }).join('')
+          : `<div class="comment-empty">Kommentaare pole veel. Ole esimene.</div>`}
       </div>
     </div>
   `;
 
   const form = commentsRoot.querySelector('[data-comment-form]');
-  if (!form) return;
-
-  form.addEventListener('submit', async (event) => {
+  form?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const textarea = form.querySelector('textarea');
     const status = form.querySelector('[data-comment-status]');
     const text = textarea.value.trim();
 
     if (!text) {
-      status.textContent = 'Введите текст комментария.';
+      status.textContent = 'Sisestage kommentaari tekst.';
       return;
     }
 
-    status.textContent = 'Отправка...';
+    status.textContent = 'Saatmine...';
     try {
       const response = await fetch(`/api/comments/${articleKey}`, {
         method: 'POST',
@@ -523,13 +570,60 @@ async function renderCommentsFromState() {
         body: JSON.stringify({ text })
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Не удалось отправить комментарий.');
+      if (!response.ok) throw new Error(data.error || 'Kommentaari saatmine ebaõnnestus.');
       textarea.value = '';
-      status.textContent = 'Комментарий добавлен.';
+      status.textContent = 'Kommentaar on lisatud.';
       await renderCommentsFromState();
     } catch (error) {
       status.textContent = error.message;
     }
+  });
+
+  // --- UUS FUNKTSIONAALSUS 3: enda kommentaari muutmine ja kustutamine ---
+  commentsRoot.querySelectorAll('[data-comment-edit]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const item = button.closest('[data-comment-id]');
+      const textEl = item.querySelector('[data-comment-text]');
+      const currentText = textEl.textContent;
+      textEl.outerHTML = `
+        <form class="comment-edit-form" data-comment-edit-form>
+          <textarea maxlength="500" rows="3" required>${currentText}</textarea>
+          <div class="comment-actions">
+            <button type="submit">Salvesta</button>
+            <button type="button" data-comment-cancel-edit>Loobu</button>
+          </div>
+        </form>
+      `;
+
+      const editForm = item.querySelector('[data-comment-edit-form]');
+      editForm.querySelector('[data-comment-cancel-edit]').addEventListener('click', () => renderCommentsFromState());
+      editForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const newText = editForm.querySelector('textarea').value.trim();
+        try {
+          await fetchJson(`/api/comments/entry/${item.dataset.commentId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ text: newText })
+          });
+          await renderCommentsFromState();
+        } catch (error) {
+          alert(error.message);
+        }
+      });
+    });
+  });
+
+  commentsRoot.querySelectorAll('[data-comment-delete]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const item = button.closest('[data-comment-id]');
+      if (!window.confirm('Kustutada see kommentaar?')) return;
+      try {
+        await fetchJson(`/api/comments/entry/${item.dataset.commentId}`, { method: 'DELETE' });
+        await renderCommentsFromState();
+      } catch (error) {
+        alert(error.message);
+      }
+    });
   });
 }
 
@@ -537,9 +631,9 @@ function articlePage(key) {
   const article = articleStore[key] || articleStore.silent;
   layout(`
     <article class="article-page">
-      <div class="article-heading reveal"><p class="eyebrow">${article.section}</p><h1>${article.title}</h1><p class="article-subtitle">${article.subtitle}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><div class="article-meta"><span>${article.year}</span><span>Чтение / 04 мин</span></div></div>
-      <div class="article-visual reveal"><img src="${article.image}" alt="Кинематографический кадр" /><span class="image-caption">Кадр как свидетель. Фильм как след.</span></div>
-      <div class="article-grid"><div class="article-aside"><span class="vertical-label">КИНОСФЕРА / ЗАПИСКИ</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}<aside class="fact"><span class="fact-label">Заметка из архива</span><p>${article.fact}</p></aside><a class="text-link" href="#/">Вернуться к хронике <span>↗</span></a>
+      <div class="article-heading reveal"><p class="eyebrow">${article.section}</p><h1>${article.title}</h1><p class="article-subtitle">${article.subtitle}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><div class="article-meta"><span>${article.year}</span><span>Lugemine / 04 min</span></div></div>
+      <div class="article-visual reveal"><img src="${article.image}" alt="Filmikaader" /><span class="image-caption">Kaader kui tunnistaja. Film kui jälg.</span></div>
+      <div class="article-grid"><div class="article-aside"><span class="vertical-label">FILMISFÄÄR / MÄRKMED</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}<aside class="fact"><span class="fact-label">Märkus arhiivist</span><p>${article.fact}</p></aside><a class="text-link" href="#/">Tagasi ajajoone juurde <span>↗</span></a>
       <div class="comments-root" data-comments-root data-article-key="${key}"></div>
       </div></div>
     </article>

@@ -20,17 +20,17 @@ export async function registerHandler(req, res) {
 
     req.session.userId = result.insertId;
     req.session.save((error) => {
-      if (error) return res.status(500).json({ error: 'Не удалось сохранить сессию.' });
+      if (error) return res.status(500).json({ error: 'Seansi salvestamine ebaõnnestus.' });
       res.status(201).json({ user: { id: result.insertId, name, email } });
     });
   } catch (error) {
-    console.error('Ошибка регистрации:', error);
+    console.error('Registreerimise viga:', error);
 
     if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ error: 'Пользователь с таким email уже зарегистрирован.' });
+      return res.status(409).json({ error: 'Selle e-postiga kasutaja on juba registreeritud.' });
     }
 
-    res.status(500).json({ error: 'Не удалось создать аккаунт.' });
+    res.status(500).json({ error: 'Konto loomine ebaõnnestus.' });
   }
 }
 

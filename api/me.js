@@ -7,7 +7,7 @@ export async function meHandler(req, res) {
     const [rows] = await pool.execute('SELECT id, name, email, role FROM users WHERE id = ?', [req.session.userId]);
     res.json({ user: rows[0] ? publicUser(rows[0]) : null });
   } catch {
-    res.status(500).json({ error: 'Не удалось проверить сессию.' });
+    res.status(500).json({ error: 'Seansi kontrollimine ebaõnnestus.' });
   }
 }
 

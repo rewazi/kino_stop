@@ -6,7 +6,7 @@ const dbConfig = {
   host: process.env.DB_HOST || '127.0.0.1',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'kinosfera',
+  database: process.env.DB_NAME || 'filmisfaar',
   waitForConnections: true,
   connectionLimit: 10,
   charset: 'utf8mb4'
@@ -126,14 +126,14 @@ export async function initializeDatabase() {
 
     await seedDefaultArticles();
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@kinosfera.local';
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@filmisfaar.local';
     const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
     const [adminRows] = await pool.execute('SELECT id FROM users WHERE email = ?', [adminEmail]);
     if (!adminRows.length) {
       const passwordHash = await bcrypt.hash(adminPassword, 12);
       await pool.execute(
         'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-        ['Администратор', adminEmail, passwordHash, 'admin']
+        ['Administraator', adminEmail, passwordHash, 'admin']
       );
     }
   } finally {
@@ -147,15 +147,15 @@ export function publicUser(user) {
 
 export function validateCredentials(name, email, password, isRegistration = false) {
   if (isRegistration && (name.length < 2 || name.length > 80)) {
-    return 'Имя должно содержать от 2 до 80 символов.';
+    return 'Nimi peab olema 2–80 tähemärki pikk.';
   }
 
   if (!/^\S+@\S+\.\S+$/.test(email)) {
-    return 'Введите корректный email.';
+    return 'Sisestage kehtiv e-posti aadress.';
   }
 
   if (password.length < 6) {
-    return 'Пароль должен содержать минимум 6 символов.';
+    return 'Parool peab sisaldama vähemalt 6 tähemärki.';
   }
 
   return null;

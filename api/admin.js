@@ -2,7 +2,7 @@ import { pool } from './config.js';
 
 function requireAdmin(req, res) {
   if (!req.session.userId) {
-    res.status(401).json({ error: 'Требуется вход в систему.' });
+    res.status(401).json({ error: 'Sisselogimine on nõutav.' });
     return false;
   }
 
@@ -31,6 +31,11 @@ async function attachTags(articleId, tagNames) {
 }
 
 export async function getArticlesHandler(req, res) {
+  // --- UUS FUNKTSIONAALSUS 2: artiklite otsimine sildi ja/või märksõna järgi ---
+  // Toetab valikulisi päringuparameetreid ?tag=<sildi nimi> ja ?q=<otsisõna>.
+  const tagFilter = String(req.query.tag || '').trim();
+  const searchQuery = String(req.query.q || '').trim().toLowerCase();
+
   try {
     const [rows] = await pool.execute(`
       SELECT a.id, a.slug, a.section, a.title, a.subtitle, a.year, a.image, a.fact, a.body,
@@ -43,15 +48,29 @@ export async function getArticlesHandler(req, res) {
       ORDER BY a.id ASC
     `);
 
-    res.json({ articles: rows.map((article) => ({
+    let articles = rows.map((article) => ({
       ...article,
       body: JSON.parse(article.body),
       tags: article.tags ? article.tags.split(', ') : [],
       tagIds: article.tag_ids ? article.tag_ids.split(',').map(Number) : []
-    })) });
+    }));
+
+    if (tagFilter) {
+      articles = articles.filter((article) => article.tags.includes(tagFilter));
+    }
+
+    if (searchQuery) {
+      articles = articles.filter((article) =>
+        article.title.toLowerCase().includes(searchQuery) ||
+        article.subtitle.toLowerCase().includes(searchQuery) ||
+        article.body.some((paragraph) => paragraph.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    res.json({ articles });
   } catch (error) {
-    console.error('Ошибка получения статей:', error);
-    res.status(500).json({ error: 'Не удалось получить статьи.' });
+    console.error('Artiklite laadimise viga:', error);
+    res.status(500).json({ error: 'Artiklite laadimine ebaõnnestus.' });
   }
 }
 
@@ -75,20 +94,20 @@ export async function adminArticlesHandler(req, res) {
     const tags = String(payload.tags || '').split(',');
 
     if (!slug || !title || !subtitle || !year || !image || !fact || body.length === 0) {
-      return res.status(422).json({ error: 'Заполните все поля статьи.' });
+      return res.status(422).json({ error: 'Täitke kõik artikli väljad.' });
     }
 
     try {
       const [result] = await pool.execute(
         'INSERT INTO articles (slug, section, title, subtitle, year, image, body, fact) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [slug, section || 'Общее', title, subtitle, year, image, JSON.stringify(body), fact]
+        [slug, section || 'Üldine', title, subtitle, year, image, JSON.stringify(body), fact]
       );
       await attachTags(result.insertId, tags);
 
-      res.status(201).json({ id: result.insertId, message: 'Статья добавлена.' });
+      res.status(201).json({ id: result.insertId, message: 'Artikkel on lisatud.' });
     } catch (error) {
-      console.error('Ошибка создания статьи:', error);
-      res.status(500).json({ error: 'Не удалось сохранить статью.' });
+      console.error('Artikli loomise viga:', error);
+      res.status(500).json({ error: 'Artikli salvestamine ebaõnnestus.' });
     }
   }
 
@@ -99,7 +118,7 @@ export async function adminArticlesHandler(req, res) {
     const body = Array.isArray(req.body.body) ? req.body.body.map((paragraph) => String(paragraph).trim()).filter(Boolean) : [];
 
     if (!articleId || !title || !fact || body.length === 0) {
-      return res.status(422).json({ error: 'Укажите название, содержимое и заметку статьи.' });
+      return res.status(422).json({ error: 'Sisestage artikli pealkiri, sisu ja märkus.' });
     }
 
     try {
@@ -109,13 +128,13 @@ export async function adminArticlesHandler(req, res) {
       );
 
       if (!result.affectedRows) {
-        return res.status(404).json({ error: 'Статья не найдена.' });
+        return res.status(404).json({ error: 'Artiklit ei leitud.' });
       }
 
-      res.json({ success: true, message: 'Статья обновлена.' });
+      res.json({ success: true, message: 'Artikkel on uuendatud.' });
     } catch (error) {
-      console.error('Ошибка обновления статьи:', error);
-      res.status(500).json({ error: 'Не удалось обновить статью.' });
+      console.error('Artikli uuendamise viga:', error);
+      res.status(500).json({ error: 'Artikli uuendamine ebaõnnestus.' });
     }
   }
 }
@@ -132,8 +151,8 @@ export async function adminCommentsHandler(req, res) {
 
     res.json({ comments: rows });
   } catch (error) {
-    console.error('Ошибка получения комментариев:', error);
-    res.status(500).json({ error: 'Не удалось получить комментарии.' });
+    console.error('Kommentaaride laadimise viga:', error);
+    res.status(500).json({ error: 'Kommentaaride laadimine ebaõnnestus.' });
   }
 }
 
@@ -142,15 +161,15 @@ export async function adminDeleteCommentHandler(req, res) {
 
   const commentId = Number(req.params.id);
   if (!commentId) {
-    return res.status(400).json({ error: 'Некорректный ID комментария.' });
+    return res.status(400).json({ error: 'Vale kommentaari ID.' });
   }
 
   try {
     await pool.execute('DELETE FROM comments WHERE id = ?', [commentId]);
-    res.json({ success: true, message: 'Комментарий удалён.' });
+    res.json({ success: true, message: 'Kommentaar on kustutatud.' });
   } catch (error) {
-    console.error('Ошибка удаления комментария:', error);
-    res.status(500).json({ error: 'Не удалось удалить комментарий.' });
+    console.error('Kommentaari kustutamise viga:', error);
+    res.status(500).json({ error: 'Kommentaari kustutamine ebaõnnestus.' });
   }
 }
 
@@ -162,8 +181,8 @@ export async function adminTagsHandler(req, res) {
       const [rows] = await pool.execute('SELECT id, name FROM tags ORDER BY name ASC');
       res.json({ tags: rows });
     } catch (error) {
-      console.error('Ошибка получения тегов:', error);
-      res.status(500).json({ error: 'Не удалось получить теги.' });
+      console.error('Siltide laadimise viga:', error);
+      res.status(500).json({ error: 'Siltide laadimine ebaõnnestus.' });
     }
     return;
   }
@@ -171,7 +190,7 @@ export async function adminTagsHandler(req, res) {
   if (req.method === 'POST') {
     const name = String(req.body.name || '').trim();
     if (!name) {
-      return res.status(422).json({ error: 'Название тега обязательно.' });
+      return res.status(422).json({ error: 'Sildi nimi on kohustuslik.' });
     }
 
     try {
@@ -179,10 +198,10 @@ export async function adminTagsHandler(req, res) {
       res.status(201).json({ id: result.insertId, name });
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(409).json({ error: 'Такой тег уже существует.' });
+        return res.status(409).json({ error: 'Selline silt on juba olemas.' });
       }
-      console.error('Ошибка создания тега:', error);
-      res.status(500).json({ error: 'Не удалось сохранить тег.' });
+      console.error('Sildi loomise viga:', error);
+      res.status(500).json({ error: 'Sildi salvestamine ebaõnnestus.' });
     }
   }
 }
@@ -192,15 +211,15 @@ export async function adminDeleteTagHandler(req, res) {
 
   const tagId = Number(req.params.id);
   if (!tagId) {
-    return res.status(400).json({ error: 'Некорректный ID тега.' });
+    return res.status(400).json({ error: 'Vale sildi ID.' });
   }
 
   try {
     await pool.execute('DELETE FROM tags WHERE id = ?', [tagId]);
-    res.json({ success: true, message: 'Тег удалён.' });
+    res.json({ success: true, message: 'Silt on kustutatud.' });
   } catch (error) {
-    console.error('Ошибка удаления тега:', error);
-    res.status(500).json({ error: 'Не удалось удалить тег.' });
+    console.error('Sildi kustutamise viga:', error);
+    res.status(500).json({ error: 'Sildi kustutamine ebaõnnestus.' });
   }
 }
 
@@ -211,15 +230,15 @@ export async function adminArticleTagsHandler(req, res) {
   const tagName = String(req.body.tag || '').trim();
 
   if (!articleId || !tagName) {
-    return res.status(422).json({ error: 'Укажите статью и тег.' });
+    return res.status(422).json({ error: 'Määrake artikkel ja silt.' });
   }
 
   try {
     await attachTags(articleId, [tagName]);
     res.status(201).json({ success: true });
   } catch (error) {
-    console.error('Ошибка привязки тега:', error);
-    res.status(500).json({ error: 'Не удалось сохранить тег для статьи.' });
+    console.error('Sildi sidumise viga:', error);
+    res.status(500).json({ error: 'Sildi salvestamine artikli jaoks ebaõnnestus.' });
   }
 }
 
@@ -229,14 +248,14 @@ export async function adminDeleteArticleTagHandler(req, res) {
   const articleId = Number(req.params.id);
   const tagId = Number(req.params.tagId);
   if (!articleId || !tagId) {
-    return res.status(400).json({ error: 'Некорректная статья или тег.' });
+    return res.status(400).json({ error: 'Vale artikkel või silt.' });
   }
 
   try {
     await pool.execute('DELETE FROM article_tags WHERE article_id = ? AND tag_id = ?', [articleId, tagId]);
-    res.json({ success: true, message: 'Тег убран со статьи.' });
+    res.json({ success: true, message: 'Silt on artiklilt eemaldatud.' });
   } catch (error) {
-    console.error('Ошибка удаления тега со статьи:', error);
-    res.status(500).json({ error: 'Не удалось убрать тег со статьи.' });
+    console.error('Sildi eemaldamise viga artiklilt:', error);
+    res.status(500).json({ error: 'Sildi eemaldamine artiklilt ebaõnnestus.' });
   }
 }

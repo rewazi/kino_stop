@@ -4,7 +4,7 @@ export async function getCommentsHandler(req, res) {
   const articleKey = String(req.params.articleKey || '').trim();
 
   if (!articleKey) {
-    return res.status(400).json({ error: 'Некорректный ключ статьи.' });
+    return res.status(400).json({ error: 'Vale artikli võti.' });
   }
 
   try {
@@ -20,25 +20,25 @@ export async function getCommentsHandler(req, res) {
 
     res.json({ comments });
   } catch (error) {
-    console.error('Ошибка загрузки комментариев:', error);
-    res.status(500).json({ error: 'Не удалось загрузить комментарии.' });
+    console.error('Kommentaaride laadimise viga:', error);
+    res.status(500).json({ error: 'Kommentaaride laadimine ebaõnnestus.' });
   }
 }
 
 export async function createCommentHandler(req, res) {
   if (!req.session.userId) {
-    return res.status(401).json({ error: 'Только зарегистрированные пользователи могут писать комментарии.' });
+    return res.status(401).json({ error: 'Ainult registreeritud kasutajad saavad kommenteerida.' });
   }
 
   const articleKey = String(req.params.articleKey || '').trim();
   const text = String(req.body.text || '').trim();
 
   if (!articleKey) {
-    return res.status(400).json({ error: 'Некорректный ключ статьи.' });
+    return res.status(400).json({ error: 'Vale artikli võti.' });
   }
 
   if (text.length < 2 || text.length > 500) {
-    return res.status(422).json({ error: 'Комментарий должен содержать от 2 до 500 символов.' });
+    return res.status(422).json({ error: 'Kommentaar peab sisaldama 2 kuni 500 tähemärki.' });
   }
 
   try {
@@ -46,7 +46,7 @@ export async function createCommentHandler(req, res) {
     const user = userRows[0];
 
     if (!user) {
-      return res.status(401).json({ error: 'Пользователь не найден. Выполните вход заново.' });
+      return res.status(401).json({ error: 'Kasutajat ei leitud. Logige uuesti sisse.' });
     }
 
     const [result] = await pool.execute(
@@ -68,9 +68,76 @@ export async function createCommentHandler(req, res) {
       }
     });
   } catch (error) {
-    console.error('Ошибка создания комментария:', error);
-    res.status(500).json({ error: 'Не удалось сохранить комментарий.' });
+    console.error('Kommentaari loomise viga:', error);
+    res.status(500).json({ error: 'Kommentaari salvestamine ebaõnnestus.' });
   }
 }
 
-export default { getCommentsHandler, createCommentHandler };
+// --- UUS FUNKTSIONAALSUS 3: kasutaja saab muuta või kustutada enda kommentaari ---
+export async function updateOwnCommentHandler(req, res) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Ainult registreeritud kasutajad saavad kommentaare muuta.' });
+  }
+
+  const commentId = Number(req.params.id);
+  const text = String(req.body.text || '').trim();
+
+  if (!commentId) {
+    return res.status(400).json({ error: 'Vale kommentaari ID.' });
+  }
+
+  if (text.length < 2 || text.length > 500) {
+    return res.status(422).json({ error: 'Kommentaar peab sisaldama 2 kuni 500 tähemärki.' });
+  }
+
+  try {
+    const [rows] = await pool.execute('SELECT id, user_id FROM comments WHERE id = ?', [commentId]);
+    const comment = rows[0];
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Kommentaari ei leitud.' });
+    }
+
+    if (comment.user_id !== req.session.userId) {
+      return res.status(403).json({ error: 'Saate muuta ainult enda kommentaare.' });
+    }
+
+    await pool.execute('UPDATE comments SET text = ? WHERE id = ?', [text, commentId]);
+    res.json({ success: true, message: 'Kommentaar on uuendatud.' });
+  } catch (error) {
+    console.error('Kommentaari muutmise viga:', error);
+    res.status(500).json({ error: 'Kommentaari muutmine ebaõnnestus.' });
+  }
+}
+
+export async function deleteOwnCommentHandler(req, res) {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Ainult registreeritud kasutajad saavad kommentaare kustutada.' });
+  }
+
+  const commentId = Number(req.params.id);
+  if (!commentId) {
+    return res.status(400).json({ error: 'Vale kommentaari ID.' });
+  }
+
+  try {
+    const [rows] = await pool.execute('SELECT id, user_id FROM comments WHERE id = ?', [commentId]);
+    const comment = rows[0];
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Kommentaari ei leitud.' });
+    }
+
+    if (comment.user_id !== req.session.userId) {
+      return res.status(403).json({ error: 'Saate kustutada ainult enda kommentaare.' });
+    }
+
+    await pool.execute('DELETE FROM comments WHERE id = ?', [commentId]);
+    res.json({ success: true, message: 'Kommentaar on kustutatud.' });
+  } catch (error) {
+    console.error('Kommentaari kustutamise viga:', error);
+    res.status(500).json({ error: 'Kommentaari kustutamine ebaõnnestus.' });
+  }
+}
+
+export default { getCommentsHandler, createCommentHandler, updateOwnCommentHandler, deleteOwnCommentHandler };
