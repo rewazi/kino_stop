@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">78.94% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>30/38</span>
+                <span class='fraction'>32/40</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">85.71% </span>
+                <span class="strong">86.48% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>30/35</span>
+                <span class='fraction'>32/37</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -135,7 +135,11 @@
 <a name='L70'></a><a href='#L70'>70</a>
 <a name='L71'></a><a href='#L71'>71</a>
 <a name='L72'></a><a href='#L72'>72</a>
-<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -176,6 +180,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -216,7 +224,7 @@ import { meHandler } from './api/me.js';
 import { registerHandler } from './api/register.js';
 import { loginHandler } from './api/login.js';
 import { logoutHandler } from './api/logout.js';
-import { getCommentsHandler, createCommentHandler } from './api/comments.js';
+import { getCommentsHandler, createCommentHandler, updateOwnCommentHandler, deleteOwnCommentHandler } from './api/comments.js';
 import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminDeleteTagHandler, adminArticleTagsHandler, adminDeleteArticleTagHandler, getArticlesHandler } from './api/admin.js';
 import { initializeDatabase } from './api/config.js';
 &nbsp;
@@ -226,7 +234,7 @@ const port = Number(process.env.PORT || 3000);
 &nbsp;
 app.use(express.json());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'kinosfera-development-secret',
+  secret: process.env.SESSION_SECRET || 'filmisfaar-development-secret',
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: 'lax', maxAge: 1000 * 60 * 60 * 24 * 7 }
@@ -248,6 +256,10 @@ for (const [name, handler] of Object.entries(authHandlers)) {
 &nbsp;
 app.get('/api/comments/:articleKey', getCommentsHandler);
 app.post('/api/comments/:articleKey', createCommentHandler);
+// UUS FUNKTSIONAALSUS 3: kasutaja saab muuta ja kustutada enda kommentaari
+app.put('/api/comments/entry/:id', updateOwnCommentHandler);
+app.delete('/api/comments/entry/:id', deleteOwnCommentHandler);
+// UUS FUNKTSIONAALSUS 2: /api/articles toetab nüüd ?tag= ja ?q= otsinguparameetreid (vt api/admin.js)
 app.get('/api/articles', getArticlesHandler);
 &nbsp;
 app.get('/api/admin/articles', adminArticlesHandler);
@@ -270,9 +282,9 @@ app.use((req, res, next) =&gt; {
 export async function <span class="fstat-no" title="function not covered" >startServer(</span>) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
 <span class="cstat-no" title="statement not covered" >    await initializeDatabase();</span>
-<span class="cstat-no" title="statement not covered" >    app.listen(port, <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >console.log(`Киносфера запущена: http://localhost:${port}`))</span>;</span>
+<span class="cstat-no" title="statement not covered" >    app.listen(port, <span class="fstat-no" title="function not covered" >()</span> =&gt; <span class="cstat-no" title="statement not covered" >console.log(`Filmisfäär käivitatud: http://localhost:${port}`))</span>;</span>
   } catch (error) {
-<span class="cstat-no" title="statement not covered" >    console.error('Не удалось инициализировать базу данных:', error.message);</span>
+<span class="cstat-no" title="statement not covered" >    console.error('Andmebaasi ei õnnestunud lähtestada:', error.message);</span>
 <span class="cstat-no" title="statement not covered" >    process.exit(1);</span>
   }
 }
@@ -286,7 +298,7 @@ const isDirectRun = process.argv[1] &amp;&amp; pathToFileURL(process.argv[1]).hr
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-09-17T06:08:17.587Z
+                at 2026-09-22T08:04:24.301Z
             </div>
         <script src="../prettify.js"></script>
         <script>

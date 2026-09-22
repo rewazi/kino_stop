@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS kinosfera
+CREATE DATABASE IF NOT EXISTS filmisfaar
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE kinosfera;
+USE filmisfaar;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS article_tags (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO users (name, email, password_hash, role)
-SELECT 'Администратор', 'admin@kinosfera.local', '$2a$12$JjT4.ZA4Az0HsmM4gF2UJeoLsGZb1M7hZ0uGzW7tOa2nqXqZ2B1PK', 'admin'
+SELECT 'Administraator', 'admin@filmisfaar.local', '$2a$12$JjT4.ZA4Az0HsmM4gF2UJeoLsGZb1M7hZ0uGzW7tOa2nqXqZ2B1PK', 'admin'
 WHERE NOT EXISTS (
-  SELECT 1 FROM users WHERE email = 'admin@kinosfera.local'
+  SELECT 1 FROM users WHERE email = 'admin@filmisfaar.local'
 );
