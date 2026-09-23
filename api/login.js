@@ -50,6 +50,7 @@ export async function loginHandler(req, res) {
     req.session.regenerate((error) => {
       if (error) return res.status(500).json({ error: 'Seansi loomine ebaõnnestus.' });
       req.session.userId = user.id;
+      req.session.role = user.role || 'user';
       res.json({ user: publicUser(user) });
     });
   } catch {

@@ -1,9 +1,29 @@
 import { pool } from './config.js';
 
-function requireAdmin(req, res) {
+export async function requireAdmin(req, res) {
   if (!req.session.userId) {
     res.status(401).json({ error: 'Sisselogimine on nõutav.' });
     return false;
+  }
+
+  if (req.session.role && req.session.role !== 'admin') {
+    res.status(403).json({ error: 'Ligipääs keelatud: administraatori õigused puuduvad.' });
+    return false;
+  }
+
+  if (!req.session.role) {
+    try {
+      const [rows] = await pool.execute('SELECT role FROM users WHERE id = ?', [req.session.userId]);
+      const userRole = rows[0]?.role;
+      if (userRole !== 'admin') {
+        res.status(403).json({ error: 'Ligipääs keelatud: administraatori õigused puuduvad.' });
+        return false;
+      }
+      req.session.role = userRole;
+    } catch {
+      res.status(500).json({ error: 'Autoriseerimise kontroll ebaõnnestus.' });
+      return false;
+    }
   }
 
   return true;
@@ -75,7 +95,7 @@ export async function getArticlesHandler(req, res) {
 }
 
 export async function adminArticlesHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   if (req.method === 'GET') {
     return getArticlesHandler(req, res);
@@ -140,7 +160,7 @@ export async function adminArticlesHandler(req, res) {
 }
 
 export async function adminCommentsHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   try {
     const [rows] = await pool.execute(`
@@ -157,7 +177,7 @@ export async function adminCommentsHandler(req, res) {
 }
 
 export async function adminDeleteCommentHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const commentId = Number(req.params.id);
   if (!commentId) {
@@ -174,7 +194,7 @@ export async function adminDeleteCommentHandler(req, res) {
 }
 
 export async function adminTagsHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   if (req.method === 'GET') {
     try {
@@ -207,7 +227,7 @@ export async function adminTagsHandler(req, res) {
 }
 
 export async function adminDeleteTagHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const tagId = Number(req.params.id);
   if (!tagId) {
@@ -224,7 +244,7 @@ export async function adminDeleteTagHandler(req, res) {
 }
 
 export async function adminArticleTagsHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const articleId = Number(req.params.id);
   const tagName = String(req.body.tag || '').trim();
@@ -243,7 +263,7 @@ export async function adminArticleTagsHandler(req, res) {
 }
 
 export async function adminDeleteArticleTagHandler(req, res) {
-  if (!requireAdmin(req, res)) return;
+  if (!(await requireAdmin(req, res))) return;
 
   const articleId = Number(req.params.id);
   const tagId = Number(req.params.tagId);

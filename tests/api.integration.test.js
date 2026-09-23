@@ -613,6 +613,42 @@ describe('Täielik API integratsioonitestide komplekt', () => {
       expect((await request(app).post('/api/admin/articles')).status).toBe(401);
     });
 
+    it('keelab admin-päringud tavakasutajale (403 Forbidden — Broken Access Control kaitse)', async () => {
+      const userAgent = request.agent(app);
+      await userAgent.post('/api/login').send({ email: 'user@filmisfaar.local', password: 'user123' });
+
+      const articlesRes = await userAgent.get('/api/admin/articles');
+      expect(articlesRes.status).toBe(403);
+      expect(articlesRes.body.error).toContain('administraatori õigused puuduvad');
+
+      const tagsRes = await userAgent.get('/api/admin/tags');
+      expect(tagsRes.status).toBe(403);
+
+      const commentsRes = await userAgent.get('/api/admin/comments');
+      expect(commentsRes.status).toBe(403);
+
+      const postArticleRes = await userAgent.post('/api/admin/articles').send({ title: 'Häkk' });
+      expect(postArticleRes.status).toBe(403);
+
+      const putArticleRes = await userAgent.put('/api/admin/articles/1').send({ title: 'Häkk' });
+      expect(putArticleRes.status).toBe(403);
+
+      const deleteCommentRes = await userAgent.delete('/api/admin/comments/1');
+      expect(deleteCommentRes.status).toBe(403);
+
+      const postTagRes = await userAgent.post('/api/admin/tags').send({ name: 'Häkk' });
+      expect(postTagRes.status).toBe(403);
+
+      const deleteTagRes = await userAgent.delete('/api/admin/tags/1');
+      expect(deleteTagRes.status).toBe(403);
+
+      const attachTagRes = await userAgent.post('/api/admin/articles/1/tags').send({ tag: 'Häkk' });
+      expect(attachTagRes.status).toBe(403);
+
+      const detachTagRes = await userAgent.delete('/api/admin/articles/1/tags/1');
+      expect(detachTagRes.status).toBe(403);
+    });
+
     it('võimaldab lisada uue artikli koos siltidega', async () => {
       const agent = request.agent(app);
       await agent.post('/api/login').send({ email: 'admin@filmisfaar.local', password: 'admin123' });

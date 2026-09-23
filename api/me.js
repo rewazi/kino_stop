@@ -5,7 +5,11 @@ export async function meHandler(req, res) {
 
   try {
     const [rows] = await pool.execute('SELECT id, name, email, role FROM users WHERE id = ?', [req.session.userId]);
-    res.json({ user: rows[0] ? publicUser(rows[0]) : null });
+    const user = rows[0];
+    if (user) {
+      req.session.role = user.role || 'user';
+    }
+    res.json({ user: user ? publicUser(user) : null });
   } catch {
     res.status(500).json({ error: 'Seansi kontrollimine ebaõnnestus.' });
   }

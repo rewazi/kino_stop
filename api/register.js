@@ -19,9 +19,10 @@ export async function registerHandler(req, res) {
     );
 
     req.session.userId = result.insertId;
+    req.session.role = 'user';
     req.session.save((error) => {
       if (error) return res.status(500).json({ error: 'Seansi salvestamine ebaõnnestus.' });
-      res.status(201).json({ user: { id: result.insertId, name, email } });
+      res.status(201).json({ user: { id: result.insertId, name, email, role: 'user' } });
     });
   } catch (error) {
     console.error('Registreerimise viga:', error);
