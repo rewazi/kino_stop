@@ -171,6 +171,20 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    await adminConnection.query(`
+      CREATE TABLE IF NOT EXISTS roadmaps (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        slug VARCHAR(80) NOT NULL,
+        title VARCHAR(180) NOT NULL,
+        subtitle TEXT NOT NULL,
+        category VARCHAR(80) NOT NULL DEFAULT 'modern_bridge',
+        steps JSON NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY roadmaps_slug_unique (slug)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     await seedDefaultArticles();
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@filmisfaar.local';

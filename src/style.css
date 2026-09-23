@@ -230,4 +230,46 @@ footer { display: flex; justify-content: space-between; padding: 25px 5vw; color
   .wl-item-poster { height: 140px; }
   .wl-item-actions { align-items: flex-start; }
 }
+
+/* --- UUS FUNKTSIOON 3: Targad Kinoteed (Roadmaps & Bridges) --- */
+.roadmaps-page { padding: 80px 12vw 110px; }
+.roadmaps-intro { max-width: 680px; margin-bottom: 40px; }
+.mood-filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 45px; }
+.mood-filter-btn { border: 1px solid var(--line); background: white; color: var(--muted); cursor: pointer; padding: 10px 16px; font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; transition: all .2s; }
+.mood-filter-btn:hover, .mood-filter-btn.active { background: var(--red); color: white; border-color: var(--red); }
+
+.bridges-grid { display: grid; gap: 40px; margin-bottom: 70px; }
+.bridge-card { background: white; border: 1px solid var(--line); padding: 32px; box-shadow: 14px 14px 0 var(--line); transition: transform .2s, box-shadow .2s; }
+.bridge-card:hover { transform: translateY(-2px); box-shadow: 14px 14px 0 var(--yellow); }
+.bridge-tagline { display: flex; justify-content: space-between; align-items: center; font: 10px 'DM Mono', monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 18px; }
+.bridge-mood-badge { background: rgba(198,75,50,.1); color: var(--red); padding: 4px 8px; }
+
+.bridge-posters-wrap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; margin: 20px 0 28px; }
+.bridge-poster-box { position: relative; height: 220px; overflow: hidden; background: #161514; }
+.bridge-poster-box img { width: 100%; height: 100%; object-fit: cover; filter: contrast(1.05); }
+.bridge-poster-label { position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,.85)); color: white; font-size: 13px; font-weight: 600; }
+.bridge-poster-label small { display: block; font: 10px 'DM Mono', monospace; color: #ddd; font-weight: 400; text-transform: uppercase; }
+.bridge-arrow-icon { font-size: 28px; color: var(--red); text-align: center; }
+
+.bridge-explanation h3 { font: 500 28px/1.15 'Playfair Display', serif; margin: 0 0 12px; }
+.bridge-explanation p { font-size: 14px; line-height: 1.7; color: var(--ink); margin: 0 0 20px; }
+.bridge-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+
+/* Kureeritud teekonnad */
+.curated-roadmaps-section { border-top: 1px solid var(--line); padding-top: 50px; margin-top: 40px; }
+.roadmap-box { background: white; border: 1px solid var(--line); padding: 32px; margin-bottom: 28px; box-shadow: 10px 10px 0 var(--line); }
+.roadmap-box h3 { font: 500 32px 'Playfair Display', serif; margin: 0 0 8px; }
+.roadmap-steps-list { display: grid; gap: 16px; margin-top: 24px; }
+.roadmap-step-item { display: grid; grid-template-columns: 60px 1fr; gap: 20px; border-top: 1px solid var(--line); padding-top: 16px; }
+.step-number { font: 14px 'DM Mono', monospace; color: var(--red); }
+.step-content strong { font-size: 15px; display: block; margin-bottom: 4px; }
+.step-content p { font-size: 13px; color: var(--muted); margin: 0 0 8px; line-height: 1.5; }
+
+@media (max-width: 760px) {
+  .bridge-posters-wrap { grid-template-columns: 1fr; }
+  .bridge-arrow-icon { transform: rotate(90deg); margin: -10px 0; }
+  .bridge-poster-box { height: 160px; }
+  .roadmap-step-item { grid-template-columns: 1fr; }
+}
+
 

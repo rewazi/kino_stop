@@ -5,6 +5,7 @@
       <a href="#/" data-route="home">Ajajoon</a>
       <a href="#/atlas" data-route="atlas">Kinoatlas</a>
       <a href="#/watchlist" data-route="watchlist">Minu nimekiri</a>
+      <a href="#/roadmaps" data-route="roadmaps">Kinoteed</a>
       <a href="#/article/silent" data-route="silent">Tummfilm</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
@@ -429,4 +430,88 @@
             `}).join(``):`<p class="tag-empty">Selles kategoorias pole veel ühtegi kirjet. Ava mõni artikkel ja lisa see oma arhiivi!</p>`}
         </div>
       </section>
-    `,`watchlist`),document.querySelectorAll(`[data-wltab]`).forEach(e=>{e.addEventListener(`click`,()=>{n=e.dataset.wltab,r()})}),document.querySelectorAll(`[data-wl-delete]`).forEach(e=>{e.addEventListener(`click`,async()=>{let n=e.dataset.wlDelete;try{await l(`/api/watchlist/${n}`,{method:`DELETE`}),t=await l(`/api/watchlist`),T(`Kirje eemaldatud arhiivist!`),r()}catch(e){T(e.message)}})})};r()}async function j(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}if(e===`/atlas`){await k(),window.scrollTo(0,0);return}if(e===`/watchlist`){await A(),window.scrollTo(0,0);return}if(e===`/daily`){await D(),window.scrollTo(0,0);return}if(e===`/quiz`){await O(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,j),j();
+    `,`watchlist`),document.querySelectorAll(`[data-wltab]`).forEach(e=>{e.addEventListener(`click`,()=>{n=e.dataset.wltab,r()})}),document.querySelectorAll(`[data-wl-delete]`).forEach(e=>{e.addEventListener(`click`,async()=>{let n=e.dataset.wlDelete;try{await l(`/api/watchlist/${n}`,{method:`DELETE`}),t=await l(`/api/watchlist`),T(`Kirje eemaldatud arhiivist!`),r()}catch(e){T(e.message)}})})};r()}async function j(){let t;try{t=await l(`/api/roadmaps`)}catch{_(`<section class="game-page"><p class="comment-empty">Kinoteede laadimine ebaõnnestus.</p></section>`,`roadmaps`);return}let n=`Kõik meeleolud`,r=()=>{let i=n===`Kõik meeleolud`?t.bridges:t.bridges.filter(e=>e.mood===n);_(`
+      <section class="roadmaps-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Kaasaegsest kinost klassika juurteni</p>
+          <h1>Targad <em>Kinoteed</em></h1>
+          <p>Klassikaline filmikunst ei ole tolmunud arhiiv — see on vundament, millele toetuvad tänased suurimad kassahitid. Vali oma lemmik kaasaegne film või meeleolu ja vaata, milline ajalooline teos selle sünnitas.</p>
+        </div>
+
+        <div class="mood-filter-bar reveal">
+          ${t.moods.map(t=>`
+            <button class="mood-filter-btn ${t===n?`active`:``}" type="button" data-mood="${e(t)}">${e(t)}</button>
+          `).join(``)}
+        </div>
+
+        <div class="bridges-grid">
+          ${i.map(t=>`
+            <div class="bridge-card reveal">
+              <div class="bridge-tagline">
+                <span>Kui sulle meeldis: <strong>${e(t.modern)}</strong></span>
+                <span class="bridge-mood-badge">${e(t.mood)}</span>
+              </div>
+
+              <div class="bridge-posters-wrap">
+                <div class="bridge-poster-box">
+                  <img src="${e(t.modernImage)}" alt="${e(t.modern)}" />
+                  <div class="bridge-poster-label">
+                    ${e(t.modern)}
+                    <small>Rež. ${e(t.modernDirector)}</small>
+                  </div>
+                </div>
+
+                <div class="bridge-arrow-icon">➔</div>
+
+                <div class="bridge-poster-box">
+                  <img src="${e(t.classicImage)}" alt="${e(t.classic)}" />
+                  <div class="bridge-poster-label">
+                    ${e(t.classic)}
+                    <small>Rež. ${e(t.classicDirector)}</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bridge-explanation">
+                <h3>${e(t.connectionTitle)}</h3>
+                <p>${e(t.whyWatch)}</p>
+                <div class="bridge-actions">
+                  <a class="text-link" href="#/article/${e(t.articleSlug)}">Loe seotud artiklit Filmisfääris <span>↗</span></a>
+                  <button class="wl-btn" type="button" data-add-to-watchlist="${e(t.articleSlug)}">🔖 Lisa arhiivi</button>
+                </div>
+              </div>
+            </div>
+          `).join(``)}
+        </div>
+
+        <div class="curated-roadmaps-section reveal">
+          <div class="game-header">
+            <p class="eyebrow">Struktureeritud õpiteekonnad</p>
+            <h2>Kureeritud <em>kinokursused</em></h2>
+            <p>Järjesta oma filmivaatamised loogilistesse teekondadesse, et mõista visuaalse keele arengut.</p>
+          </div>
+
+          <div class="curated-roadmaps-grid">
+            ${t.roadmaps.map(t=>`
+              <div class="roadmap-box">
+                <h3>${e(t.title)}</h3>
+                <p style="color:var(--muted); font-size:14px; margin:0 0 16px;">${e(t.subtitle)}</p>
+                <div class="roadmap-steps-list">
+                  ${t.steps.map(t=>`
+                    <div class="roadmap-step-item">
+                      <div class="step-number">Samm 0${t.step}</div>
+                      <div class="step-content">
+                        <strong>${e(t.title)} (${e(t.era)})</strong>
+                        <p><strong>Soovitus:</strong> ${e(t.film)}</p>
+                        <p>${e(t.focus)}</p>
+                        <a class="text-link" href="#/article/${e(t.targetArticle)}">Vaata ajastu peatükki <span>↗</span></a>
+                      </div>
+                    </div>
+                  `).join(``)}
+                </div>
+              </div>
+            `).join(``)}
+          </div>
+        </div>
+      </section>
+    `,`roadmaps`),document.querySelectorAll(`[data-mood]`).forEach(e=>{e.addEventListener(`click`,()=>{n=e.dataset.mood,r()})}),document.querySelectorAll(`[data-add-to-watchlist]`).forEach(e=>{e.addEventListener(`click`,async()=>{if(!a){m(`login`);return}let t=e.dataset.addToWatchlist;try{await l(`/api/watchlist`,{method:`POST`,body:JSON.stringify({article_slug:t,status:`want`})}),T(`Lisatud isiklikku arhiivi! 🔖`)}catch(e){T(e.message)}})})};r()}async function M(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}if(e===`/atlas`){await k(),window.scrollTo(0,0);return}if(e===`/watchlist`){await A(),window.scrollTo(0,0);return}if(e===`/roadmaps`){await j(),window.scrollTo(0,0);return}if(e===`/daily`){await D(),window.scrollTo(0,0);return}if(e===`/quiz`){await O(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,M),M();

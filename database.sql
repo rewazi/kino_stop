@@ -101,6 +101,18 @@ CREATE TABLE IF NOT EXISTS watchlist (
   CONSTRAINT fk_watchlist_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS roadmaps (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  slug VARCHAR(80) NOT NULL,
+  title VARCHAR(180) NOT NULL,
+  subtitle TEXT NOT NULL,
+  category VARCHAR(80) NOT NULL DEFAULT 'modern_bridge',
+  steps JSON NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY roadmaps_slug_unique (slug)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO users (name, email, password_hash, role)
 SELECT 'Administraator', 'admin@filmisfaar.local', '$2a$12$JjT4.ZA4Az0HsmM4gF2UJeoLsGZb1M7hZ0uGzW7tOa2nqXqZ2B1PK', 'admin'
 WHERE NOT EXISTS (

@@ -59,6 +59,7 @@ const nav = `
       <a href="#/" data-route="home">Ajajoon</a>
       <a href="#/atlas" data-route="atlas">Kinoatlas</a>
       <a href="#/watchlist" data-route="watchlist">Minu nimekiri</a>
+      <a href="#/roadmaps" data-route="roadmaps">Kinoteed</a>
       <a href="#/article/silent" data-route="silent">Tummfilm</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
@@ -1243,6 +1244,140 @@ async function watchlistPage() {
   renderWl();
 }
 
+async function roadmapsPage() {
+  let data;
+  try {
+    data = await fetchJson('/api/roadmaps');
+  } catch {
+    layout('<section class="game-page"><p class="comment-empty">Kinoteede laadimine ebaõnnestus.</p></section>', 'roadmaps');
+    return;
+  }
+
+  let selectedMood = 'Kõik meeleolud';
+
+  const renderRoadmaps = () => {
+    const filteredBridges = selectedMood === 'Kõik meeleolud'
+      ? data.bridges
+      : data.bridges.filter((b) => b.mood === selectedMood);
+
+    const content = `
+      <section class="roadmaps-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Kaasaegsest kinost klassika juurteni</p>
+          <h1>Targad <em>Kinoteed</em></h1>
+          <p>Klassikaline filmikunst ei ole tolmunud arhiiv — see on vundament, millele toetuvad tänased suurimad kassahitid. Vali oma lemmik kaasaegne film või meeleolu ja vaata, milline ajalooline teos selle sünnitas.</p>
+        </div>
+
+        <div class="mood-filter-bar reveal">
+          ${data.moods.map((m) => `
+            <button class="mood-filter-btn ${m === selectedMood ? 'active' : ''}" type="button" data-mood="${escapeHtml(m)}">${escapeHtml(m)}</button>
+          `).join('')}
+        </div>
+
+        <div class="bridges-grid">
+          ${filteredBridges.map((b) => `
+            <div class="bridge-card reveal">
+              <div class="bridge-tagline">
+                <span>Kui sulle meeldis: <strong>${escapeHtml(b.modern)}</strong></span>
+                <span class="bridge-mood-badge">${escapeHtml(b.mood)}</span>
+              </div>
+
+              <div class="bridge-posters-wrap">
+                <div class="bridge-poster-box">
+                  <img src="${escapeHtml(b.modernImage)}" alt="${escapeHtml(b.modern)}" />
+                  <div class="bridge-poster-label">
+                    ${escapeHtml(b.modern)}
+                    <small>Rež. ${escapeHtml(b.modernDirector)}</small>
+                  </div>
+                </div>
+
+                <div class="bridge-arrow-icon">➔</div>
+
+                <div class="bridge-poster-box">
+                  <img src="${escapeHtml(b.classicImage)}" alt="${escapeHtml(b.classic)}" />
+                  <div class="bridge-poster-label">
+                    ${escapeHtml(b.classic)}
+                    <small>Rež. ${escapeHtml(b.classicDirector)}</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bridge-explanation">
+                <h3>${escapeHtml(b.connectionTitle)}</h3>
+                <p>${escapeHtml(b.whyWatch)}</p>
+                <div class="bridge-actions">
+                  <a class="text-link" href="#/article/${escapeHtml(b.articleSlug)}">Loe seotud artiklit Filmisfääris <span>↗</span></a>
+                  <button class="wl-btn" type="button" data-add-to-watchlist="${escapeHtml(b.articleSlug)}">🔖 Lisa arhiivi</button>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="curated-roadmaps-section reveal">
+          <div class="game-header">
+            <p class="eyebrow">Struktureeritud õpiteekonnad</p>
+            <h2>Kureeritud <em>kinokursused</em></h2>
+            <p>Järjesta oma filmivaatamised loogilistesse teekondadesse, et mõista visuaalse keele arengut.</p>
+          </div>
+
+          <div class="curated-roadmaps-grid">
+            ${data.roadmaps.map((r) => `
+              <div class="roadmap-box">
+                <h3>${escapeHtml(r.title)}</h3>
+                <p style="color:var(--muted); font-size:14px; margin:0 0 16px;">${escapeHtml(r.subtitle)}</p>
+                <div class="roadmap-steps-list">
+                  ${r.steps.map((s) => `
+                    <div class="roadmap-step-item">
+                      <div class="step-number">Samm 0${s.step}</div>
+                      <div class="step-content">
+                        <strong>${escapeHtml(s.title)} (${escapeHtml(s.era)})</strong>
+                        <p><strong>Soovitus:</strong> ${escapeHtml(s.film)}</p>
+                        <p>${escapeHtml(s.focus)}</p>
+                        <a class="text-link" href="#/article/${escapeHtml(s.targetArticle)}">Vaata ajastu peatükki <span>↗</span></a>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </section>
+    `;
+
+    layout(content, 'roadmaps');
+
+    document.querySelectorAll('[data-mood]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        selectedMood = btn.dataset.mood;
+        renderRoadmaps();
+      });
+    });
+
+    document.querySelectorAll('[data-add-to-watchlist]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        if (!currentUser) {
+          openAuth('login');
+          return;
+        }
+        const slug = btn.dataset.addToWatchlist;
+        try {
+          await fetchJson('/api/watchlist', {
+            method: 'POST',
+            body: JSON.stringify({ article_slug: slug, status: 'want' })
+          });
+          showToast('Lisatud isiklikku arhiivi! 🔖');
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  };
+
+  renderRoadmaps();
+}
+
 async function render() {
   await loadArticles(true);
   const path = window.location.hash.replace('#', '') || '/';
@@ -1263,6 +1398,11 @@ async function render() {
   }
   if (path === '/watchlist') {
     await watchlistPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (path === '/roadmaps') {
+    await roadmapsPage();
     window.scrollTo(0, 0);
     return;
   }

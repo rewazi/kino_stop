@@ -15,6 +15,7 @@ import { getDailyChallengeHandler, guessDailyChallengeHandler } from './api/dail
 import { getQuizHandler } from './api/quiz.js';
 import { getWatchlistHandler, saveWatchlistHandler, deleteWatchlistHandler } from './api/watchlist.js';
 import { getAtlasHandler } from './api/atlas.js';
+import { getRoadmapsHandler, getRoadmapDetailHandler } from './api/roadmaps.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
@@ -63,6 +64,10 @@ app.get('/api/atlas', getAtlasHandler);
 app.get('/api/watchlist', getWatchlistHandler);
 app.post('/api/watchlist', saveWatchlistHandler);
 app.delete('/api/watchlist/:articleSlug', deleteWatchlistHandler);
+
+// TARGAD KINOTEED (ROADMAPS)
+app.get('/api/roadmaps', getRoadmapsHandler);
+app.get('/api/roadmaps/:slug', getRoadmapDetailHandler);
 
 app.get('/api/admin/articles', adminArticlesHandler);
 app.post('/api/admin/articles', adminArticlesHandler);

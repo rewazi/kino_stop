@@ -485,6 +485,13 @@ describe('Visuaalne End-to-End (E2E) brauseritest — kasutajaliidese läbimine'
     await page.waitForSelector('.watchlist-stats-grid');
     expect(await page.locator('.watchlist-stats-grid').isVisible()).toBe(true);
 
+    // SAMM 16: Kinoteede (Roadmaps) vaate testimine
+    await page.locator('[data-route="roadmaps"]').click();
+    await page.waitForURL(`${baseUrl}/#/roadmaps`);
+    await page.waitForSelector('.bridges-grid');
+    expect(await page.locator('.bridges-grid').isVisible()).toBe(true);
+    expect(await page.locator('.bridge-card').count()).toBeGreaterThanOrEqual(4);
+
     // Lühike paus, et kasutaja jõuaks näha viimast vaadet
     await page.waitForTimeout(1000);
   }, 45000);
