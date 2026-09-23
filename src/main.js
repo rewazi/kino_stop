@@ -57,6 +57,8 @@ const nav = `
     <a class="brand" href="#/">FILMI<span>SFÄÄR</span></a>
     <nav class="main-nav" aria-label="Peamine navigatsioon">
       <a href="#/" data-route="home">Ajajoon</a>
+      <a href="#/atlas" data-route="atlas">Kinoatlas</a>
+      <a href="#/watchlist" data-route="watchlist">Minu nimekiri</a>
       <a href="#/article/silent" data-route="silent">Tummfilm</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
@@ -644,7 +646,19 @@ function articlePage(key) {
   const article = articleStore[key] || articleStore.silent;
   layout(`
     <article class="article-page">
-      <div class="article-heading reveal"><p class="eyebrow">${escapeHtml(article.section)}</p><h1>${escapeHtml(article.title)}</h1><p class="article-subtitle">${escapeHtml(article.subtitle)}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('')}</div><div class="article-meta"><span>${escapeHtml(article.year)}</span><span>Lugemine / 04 min</span></div></div>
+      <div class="article-heading reveal">
+        <p class="eyebrow">${escapeHtml(article.section)}</p>
+        <h1>${escapeHtml(article.title)}</h1>
+        <p class="article-subtitle">${escapeHtml(article.subtitle)}</p>
+        <div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('')}</div>
+        <div class="article-watchlist-bar" data-watchlist-bar data-article-slug="${key}">
+          <span class="bar-label">Minu arhiiv:</span>
+          <button class="wl-btn" type="button" data-wl-action="want">🔖 Soovin vaadata</button>
+          <button class="wl-btn" type="button" data-wl-action="watched">👁️ Vaadatud</button>
+          <button class="wl-btn" type="button" data-wl-action="favorite">⭐ Lemmik</button>
+        </div>
+        <div class="article-meta"><span>${escapeHtml(article.year)}</span><span>Lugemine / 04 min</span></div>
+      </div>
       <div class="article-visual reveal"><img src="${escapeHtml(article.image)}" alt="Filmikaader" /><span class="image-caption">Kaader kui tunnistaja. Film kui jälg.</span></div>
       <div class="article-grid"><div class="article-aside"><span class="vertical-label">FILMISFÄÄR / MÄRKMED</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}<aside class="fact"><span class="fact-label">Märkus arhiivist</span><p>${escapeHtml(article.fact)}</p></aside><a class="text-link" href="#/">Tagasi ajajoone juurde <span>↗</span></a>
       <div class="comments-root" data-comments-root data-article-key="${key}"></div>
@@ -653,6 +667,47 @@ function articlePage(key) {
   `, key);
 
   renderCommentsFromState();
+  setupArticleWatchlist(key);
+}
+
+async function setupArticleWatchlist(key) {
+  const bar = document.querySelector('[data-watchlist-bar]');
+  if (!bar) return;
+
+  const updateButtons = (currentStatus) => {
+    bar.querySelectorAll('.wl-btn').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.wlAction === currentStatus);
+    });
+  };
+
+  if (currentUser) {
+    try {
+      const data = await fetchJson('/api/watchlist');
+      const item = (data.items || []).find((i) => i.article_slug === key);
+      if (item) updateButtons(item.status);
+    } catch {}
+  }
+
+  bar.querySelectorAll('.wl-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!currentUser) {
+        openAuth('login');
+        return;
+      }
+      const action = btn.dataset.wlAction;
+      try {
+        await fetchJson('/api/watchlist', {
+          method: 'POST',
+          body: JSON.stringify({ article_slug: key, status: action })
+        });
+        updateButtons(action);
+        const labels = { want: 'Lisatud soovinimekirja! 🔖', watched: 'Märgitud vaadatuks! 👁️', favorite: 'Märgitud lemmikuks! ⭐' };
+        showToast(labels[action] || 'Salvestatud!');
+      } catch (err) {
+        showToast(err.message);
+      }
+    });
+  });
 }
 
 export function showToast(message) {
@@ -975,6 +1030,219 @@ async function quizPage() {
   renderQuiz();
 }
 
+async function atlasPage() {
+  let atlasData;
+  try {
+    atlasData = await fetchJson('/api/atlas');
+  } catch {
+    layout('<section class="game-page"><p class="comment-empty">Kinoatlase laadimine ebaõnnestus.</p></section>', 'atlas');
+    return;
+  }
+
+  let selectedCountry = 'Kõik';
+  let userWatchlistSlugs = new Set();
+  if (currentUser) {
+    try {
+      const wlData = await fetchJson('/api/watchlist');
+      userWatchlistSlugs = new Set((wlData.items || []).filter((i) => i.status === 'watched' || i.status === 'favorite').map((i) => i.article_slug));
+    } catch {}
+  }
+
+  const renderAtlas = () => {
+    const filtered = selectedCountry === 'Kõik'
+      ? atlasData.milestones
+      : atlasData.milestones.filter((m) => m.country === selectedCountry);
+
+    const watchedCount = atlasData.milestones.filter((m) => m.articleSlug && userWatchlistSlugs.has(m.articleSlug)).length;
+
+    const content = `
+      <section class="atlas-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Kinematograafiline geograafia ja ajalugu</p>
+          <h1>Kinoatlas <em>1895—tänapäevani</em></h1>
+          <p>Rända läbi kinoloo pöördeliste ajastute, riikide ja liikumiste. Vaata, kuidas liikuva pildi kunst levis Pariisi kohvikutest Hollywoodi stuudiotesse ja sealt üle terve maailma.</p>
+          ${currentUser ? `
+            <div class="game-stats-badge">🏛️ Avastatud Filmisfääri ajastud: ${watchedCount} / 3</div>
+          ` : ''}
+        </div>
+
+        <div class="atlas-filters reveal">
+          ${atlasData.countries.map((c) => `
+            <button class="atlas-filter-btn ${c === selectedCountry ? 'active' : ''}" type="button" data-country="${escapeHtml(c)}">${escapeHtml(c)}</button>
+          `).join('')}
+        </div>
+
+        <div class="atlas-timeline">
+          ${filtered.map((node) => `
+            <div class="atlas-node reveal">
+              <div class="atlas-dot"></div>
+              <img class="atlas-node-img" src="${escapeHtml(node.image)}" alt="${escapeHtml(node.title)}" />
+              <div class="atlas-node-content">
+                <div class="atlas-node-meta">
+                  <span class="year-pill">${escapeHtml(node.year)}</span>
+                  <span class="country-pill">${escapeHtml(node.country)}</span>
+                  <span class="movement-pill">${escapeHtml(node.movement)}</span>
+                  <span>${escapeHtml(node.period)}</span>
+                </div>
+                <h3>${escapeHtml(node.title)}</h3>
+                <p class="atlas-node-desc">${escapeHtml(node.summary)}</p>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:6px;"><strong>Lavastajad / Peategelased:</strong> ${escapeHtml(node.director)}</div>
+                <div class="atlas-node-fact">${escapeHtml(node.fact)}</div>
+                ${node.articleSlug ? `
+                  <p style="margin-top:14px;">
+                    <a class="text-link" href="#/article/${escapeHtml(node.articleSlug)}">Loe pikemat artiklit Filmisfääris <span>↗</span></a>
+                  </p>
+                ` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </section>
+    `;
+
+    layout(content, 'atlas');
+
+    document.querySelectorAll('[data-country]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        selectedCountry = btn.dataset.country;
+        renderAtlas();
+      });
+    });
+  };
+
+  renderAtlas();
+}
+
+async function watchlistPage() {
+  if (!currentUser) {
+    layout(`
+      <section class="watchlist-page">
+        <div class="auth-cta-box reveal">
+          <p class="eyebrow">Isiklik kinoteek</p>
+          <h2>Sinu personaalne filmiloo arhiiv</h2>
+          <p>Märgi filme ja artikleid vaadatuks, koosta isiklikke soovinimekirju, hinda klassikuid ning teeni kinomaani aumärke.</p>
+          <div style="display:flex; justify-content:center; gap:12px;">
+            <button class="auth-submit" type="button" data-auth="login">Logi sisse <span>↗</span></button>
+            <button class="auth-submit" style="background:var(--ink);" type="button" data-auth="register">Loo konto <span>↗</span></button>
+          </div>
+        </div>
+      </section>
+    `, 'watchlist');
+    return;
+  }
+
+  let wlData;
+  try {
+    wlData = await fetchJson('/api/watchlist');
+  } catch {
+    layout('<section class="watchlist-page"><p class="comment-empty">Watchlisti laadimine ebaõnnestus.</p></section>', 'watchlist');
+    return;
+  }
+
+  let activeTab = 'all';
+
+  const renderWl = () => {
+    const stats = wlData.stats || { total: 0, watchedCount: 0, wantCount: 0, favoriteCount: 0, progressPercent: 0 };
+    const items = wlData.items || [];
+    const badges = wlData.badges || [];
+
+    const filtered = items.filter((item) => {
+      if (activeTab === 'all') return true;
+      return item.status === activeTab;
+    });
+
+    const content = `
+      <section class="watchlist-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Minu kinoteek</p>
+          <h1>Isiklik <em>filmiloo arhiiv</em></h1>
+          <p>Halda oma vaadatud ja kavas olevaid filmikunsti pärle, jälgi oma edusamme ja teeni kinoloo aumärke.</p>
+        </div>
+
+        <div class="watchlist-stats-grid reveal">
+          <div class="stat-box"><strong>${stats.total}</strong><span>Kokku salvestatud</span></div>
+          <div class="stat-box"><strong>${stats.watchedCount}</strong><span>Vaadatud 👁️</span></div>
+          <div class="stat-box"><strong>${stats.favoriteCount}</strong><span>Lemmikud ⭐</span></div>
+          <div class="stat-box"><strong>${stats.progressPercent}%</strong><span>Ajastute läbivus</span></div>
+        </div>
+
+        ${badges.length ? `
+          <div class="badges-section reveal">
+            <div class="badges-title">Kogutud aumärgid (${badges.length})</div>
+            <div class="badges-grid">
+              ${badges.map((b) => `
+                <div class="badge-card">
+                  <span class="badge-icon">🎖️</span>
+                  <div class="badge-info">
+                    <strong>${escapeHtml(b.name)}</strong>
+                    <small>${escapeHtml(b.desc)}</small>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <div class="watchlist-tabs">
+          <button class="wl-tab ${activeTab === 'all' ? 'active' : ''}" type="button" data-wltab="all">Kõik (${stats.total})</button>
+          <button class="wl-tab ${activeTab === 'want' ? 'active' : ''}" type="button" data-wltab="want">Soovin vaadata (${stats.wantCount})</button>
+          <button class="wl-tab ${activeTab === 'watched' ? 'active' : ''}" type="button" data-wltab="watched">Vaadatud (${stats.watchedCount})</button>
+          <button class="wl-tab ${activeTab === 'favorite' ? 'active' : ''}" type="button" data-wltab="favorite">Lemmikud (${stats.favoriteCount})</button>
+        </div>
+
+        <div class="watchlist-grid">
+          ${filtered.length ? filtered.map((item) => {
+            const article = articleStore[item.article_slug] || { title: item.article_slug, subtitle: '', image: '', year: '' };
+            const statusLabels = { want: 'Soovin vaadata 🔖', watched: 'Vaadatud 👁️', favorite: 'Lemmik ⭐' };
+            return `
+              <div class="wl-item-card reveal">
+                <img class="wl-item-poster" src="${escapeHtml(article.image || 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80')}" alt="${escapeHtml(article.title)}" />
+                <div class="wl-item-info">
+                  <div class="wl-item-meta">
+                    <span class="wl-status-badge ${escapeHtml(item.status)}">${statusLabels[item.status] || item.status}</span>
+                    <span>${escapeHtml(article.year)}</span>
+                  </div>
+                  <h3><a href="#/article/${escapeHtml(item.article_slug)}">${escapeHtml(article.title)}</a></h3>
+                  <p style="margin:0; font-size:13px; color:var(--muted);">${escapeHtml(article.subtitle)}</p>
+                </div>
+                <div class="wl-item-actions">
+                  <a class="text-link" href="#/article/${escapeHtml(item.article_slug)}">Vaata artiklit <span>↗</span></a>
+                  <button class="wl-delete-btn" type="button" data-wl-delete="${escapeHtml(item.article_slug)}">Eemalda arhiivist ×</button>
+                </div>
+              </div>
+            `;
+          }).join('') : '<p class="tag-empty">Selles kategoorias pole veel ühtegi kirjet. Ava mõni artikkel ja lisa see oma arhiivi!</p>'}
+        </div>
+      </section>
+    `;
+
+    layout(content, 'watchlist');
+
+    document.querySelectorAll('[data-wltab]').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        activeTab = tab.dataset.wltab;
+        renderWl();
+      });
+    });
+
+    document.querySelectorAll('[data-wl-delete]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const slug = btn.dataset.wlDelete;
+        try {
+          await fetchJson(`/api/watchlist/${slug}`, { method: 'DELETE' });
+          wlData = await fetchJson('/api/watchlist');
+          showToast('Kirje eemaldatud arhiivist!');
+          renderWl();
+        } catch (err) {
+          showToast(err.message);
+        }
+      });
+    });
+  };
+
+  renderWl();
+}
+
 async function render() {
   await loadArticles(true);
   const path = window.location.hash.replace('#', '') || '/';
@@ -985,6 +1253,16 @@ async function render() {
   }
   if (path === '/tags') {
     tagsPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (path === '/atlas') {
+    await atlasPage();
+    window.scrollTo(0, 0);
+    return;
+  }
+  if (path === '/watchlist') {
+    await watchlistPage();
     window.scrollTo(0, 0);
     return;
   }

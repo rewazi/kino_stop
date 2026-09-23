@@ -3,6 +3,8 @@
     <a class="brand" href="#/">FILMI<span>SFÄÄR</span></a>
     <nav class="main-nav" aria-label="Peamine navigatsioon">
       <a href="#/" data-route="home">Ajajoon</a>
+      <a href="#/atlas" data-route="atlas">Kinoatlas</a>
+      <a href="#/watchlist" data-route="watchlist">Minu nimekiri</a>
       <a href="#/article/silent" data-route="silent">Tummfilm</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
@@ -174,13 +176,25 @@
         </form>
       `;let a=n.querySelector(`[data-comment-edit-form]`);a.querySelector(`[data-comment-cancel-edit]`).addEventListener(`click`,()=>S()),a.addEventListener(`submit`,async e=>{e.preventDefault();let t=a.querySelector(`textarea`).value.trim();try{await l(`/api/comments/entry/${n.dataset.commentId}`,{method:`PUT`,body:JSON.stringify({text:t})}),await S()}catch(e){alert(e.message)}})})}),t.querySelectorAll(`[data-comment-delete]`).forEach(e=>{e.addEventListener(`click`,async()=>{let t=e.closest(`[data-comment-id]`);if(window.confirm(`Kustutada see kommentaar?`))try{await l(`/api/comments/entry/${t.dataset.commentId}`,{method:`DELETE`}),await S()}catch(e){alert(e.message)}})})}function C(t){let n=o[t]||o.silent;_(`
     <article class="article-page">
-      <div class="article-heading reveal"><p class="eyebrow">${e(n.section)}</p><h1>${e(n.title)}</h1><p class="article-subtitle">${e(n.subtitle)}</p><div class="article-tags article-tags-large">${(n.tags||[]).map(t=>`<span class="tag-chip">${e(t)}</span>`).join(``)}</div><div class="article-meta"><span>${e(n.year)}</span><span>Lugemine / 04 min</span></div></div>
+      <div class="article-heading reveal">
+        <p class="eyebrow">${e(n.section)}</p>
+        <h1>${e(n.title)}</h1>
+        <p class="article-subtitle">${e(n.subtitle)}</p>
+        <div class="article-tags article-tags-large">${(n.tags||[]).map(t=>`<span class="tag-chip">${e(t)}</span>`).join(``)}</div>
+        <div class="article-watchlist-bar" data-watchlist-bar data-article-slug="${t}">
+          <span class="bar-label">Minu arhiiv:</span>
+          <button class="wl-btn" type="button" data-wl-action="want">🔖 Soovin vaadata</button>
+          <button class="wl-btn" type="button" data-wl-action="watched">👁️ Vaadatud</button>
+          <button class="wl-btn" type="button" data-wl-action="favorite">⭐ Lemmik</button>
+        </div>
+        <div class="article-meta"><span>${e(n.year)}</span><span>Lugemine / 04 min</span></div>
+      </div>
       <div class="article-visual reveal"><img src="${e(n.image)}" alt="Filmikaader" /><span class="image-caption">Kaader kui tunnistaja. Film kui jälg.</span></div>
       <div class="article-grid"><div class="article-aside"><span class="vertical-label">FILMISFÄÄR / MÄRKMED</span></div><div class="article-body">${n.body.map(t=>`<p>${e(t)}</p>`).join(``)}<aside class="fact"><span class="fact-label">Märkus arhiivist</span><p>${e(n.fact)}</p></aside><a class="text-link" href="#/">Tagasi ajajoone juurde <span>↗</span></a>
       <div class="comments-root" data-comments-root data-article-key="${t}"></div>
       </div></div>
     </article>
-  `,t),S()}function w(e){let t=document.querySelector(`.toast-notice`);t&&t.remove();let n=document.createElement(`div`);n.className=`toast-notice`,n.textContent=e,document.body.appendChild(n),setTimeout(()=>{n.parentNode&&n.remove()},2600)}async function T(e,t=`Tulemus kopeeritud lõikelauale! 📋`){try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(e);else{let t=document.createElement(`textarea`);t.value=e,document.body.appendChild(t),t.select(),document.execCommand(`copy`),t.remove()}w(t)}catch{w(`Kopeerimine ebaõnnestus.`)}}async function E(){let t;try{t=await l(`/api/daily`)}catch{_(`<section class="game-page"><p class="comment-empty">Päeva kaadrit ei õnnestunud laadida. Kontrolli võrguühendust.</p></section>`,`daily`);return}let n=`filmisfaar_daily_${t.date}`,r=localStorage.getItem(n),i=r?JSON.parse(r):{guesses:[],isSolved:!1,isOver:!1,resultInfo:null},a=Number(localStorage.getItem(`filmisfaar_streak`)||0),o=()=>i.guesses.map((e,t)=>i.isSolved&&t===i.guesses.length-1?`🟩`:`🟥`).concat(Array(Math.max(0,5-i.guesses.length)).fill(`⬛`)).join(``),s=()=>{let r=Array.from({length:5}).map((t,n)=>{let r=i.guesses[n];if(r){let t=i.isSolved&&n===i.guesses.length-1;return`<div class="attempt-slot ${t?`correct`:`wrong`}">${n+1}. ${e(r)} ${t?`✓`:`✗`}</div>`}return`<div class="attempt-slot ${n===i.guesses.length&&!i.isOver?`active`:``}">${n+1}. —</div>`}).join(``),c=t.hints.map((t,n)=>{let r=i.guesses.length>n||i.isOver;return`
+  `,t),S(),w(t)}async function w(e){let t=document.querySelector(`[data-watchlist-bar]`);if(!t)return;let n=e=>{t.querySelectorAll(`.wl-btn`).forEach(t=>{t.classList.toggle(`active`,t.dataset.wlAction===e)})};if(a)try{let t=((await l(`/api/watchlist`)).items||[]).find(t=>t.article_slug===e);t&&n(t.status)}catch{}t.querySelectorAll(`.wl-btn`).forEach(t=>{t.addEventListener(`click`,async()=>{if(!a){m(`login`);return}let r=t.dataset.wlAction;try{await l(`/api/watchlist`,{method:`POST`,body:JSON.stringify({article_slug:e,status:r})}),n(r),T({want:`Lisatud soovinimekirja! 🔖`,watched:`Märgitud vaadatuks! 👁️`,favorite:`Märgitud lemmikuks! ⭐`}[r]||`Salvestatud!`)}catch(e){T(e.message)}})})}function T(e){let t=document.querySelector(`.toast-notice`);t&&t.remove();let n=document.createElement(`div`);n.className=`toast-notice`,n.textContent=e,document.body.appendChild(n),setTimeout(()=>{n.parentNode&&n.remove()},2600)}async function E(e,t=`Tulemus kopeeritud lõikelauale! 📋`){try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(e);else{let t=document.createElement(`textarea`);t.value=e,document.body.appendChild(t),t.select(),document.execCommand(`copy`),t.remove()}T(t)}catch{T(`Kopeerimine ebaõnnestus.`)}}async function D(){let t;try{t=await l(`/api/daily`)}catch{_(`<section class="game-page"><p class="comment-empty">Päeva kaadrit ei õnnestunud laadida. Kontrolli võrguühendust.</p></section>`,`daily`);return}let n=`filmisfaar_daily_${t.date}`,r=localStorage.getItem(n),i=r?JSON.parse(r):{guesses:[],isSolved:!1,isOver:!1,resultInfo:null},a=Number(localStorage.getItem(`filmisfaar_streak`)||0),o=()=>i.guesses.map((e,t)=>i.isSolved&&t===i.guesses.length-1?`🟩`:`🟥`).concat(Array(Math.max(0,5-i.guesses.length)).fill(`⬛`)).join(``),s=()=>{let r=Array.from({length:5}).map((t,n)=>{let r=i.guesses[n];if(r){let t=i.isSolved&&n===i.guesses.length-1;return`<div class="attempt-slot ${t?`correct`:`wrong`}">${n+1}. ${e(r)} ${t?`✓`:`✗`}</div>`}return`<div class="attempt-slot ${n===i.guesses.length&&!i.isOver?`active`:``}">${n+1}. —</div>`}).join(``),c=t.hints.map((t,n)=>{let r=i.guesses.length>n||i.isOver;return`
         <div class="hint-item">
           <span class="hint-badge">Vihje ${n+1}</span>
           <span class="${r?``:`hint-locked`}">${r?e(t):`Lukus (avaneb pärast `+(n+1)+`. katset)`}</span>
@@ -234,7 +248,7 @@
 
         ${u}
       </section>
-    `,`daily`),i.isOver){let e=`🎬 Filmisfäär Kaader Päevas #${t.dayNumber}\n${o()} (${i.isSolved?i.guesses.length:`X`}/5)\n\n${i.isSolved?`Arvasin tänase filmikaadri ära!`:`Tänane kaader oli tõeline pähkel!`}\n${window.location.origin}/#/daily`;document.querySelector(`[data-share-copy]`)?.addEventListener(`click`,()=>{T(e)}),document.querySelector(`[data-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/daily`)}&text=${encodeURIComponent(e)}`,`_blank`)}),document.querySelector(`[data-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(e)}`,`_blank`)})}else{let e=document.querySelector(`[data-daily-form]`);e?.addEventListener(`submit`,async r=>{r.preventDefault();let o=e.querySelector(`input[name="guess"]`).value.trim();if(o)try{let e=await l(`/api/daily/guess`,{method:`POST`,body:JSON.stringify({guess:o})});i.guesses.push(o),e.isCorrect?(i.isSolved=!0,i.isOver=!0,i.resultInfo=e,localStorage.setItem(`filmisfaar_streak`,String(a+1))):i.guesses.length>=t.maxAttempts&&(i.isOver=!0,i.resultInfo={title:t.hints[0]?`Katsed lõppesid`:`Film arhiivist`,year:`Tundmatu`,director:`Tundmatu`,fact:`Vaata homme uuesti ja pane end uuesti proovile!`},localStorage.setItem(`filmisfaar_streak`,`0`)),localStorage.setItem(n,JSON.stringify(i)),s()}catch(e){w(e.message)}})}};s()}async function D(){let t;try{t=await l(`/api/quiz`)}catch{_(`<section class="game-page"><p class="comment-empty">Viktoriini laadimine ebaõnnestus.</p></section>`,`quiz`);return}let n=0,r=[],i=()=>{if(n<t.questions.length){let a=t.questions[n],o=Math.round((n+1)/t.questions.length*100);_(`
+    `,`daily`),i.isOver){let e=`🎬 Filmisfäär Kaader Päevas #${t.dayNumber}\n${o()} (${i.isSolved?i.guesses.length:`X`}/5)\n\n${i.isSolved?`Arvasin tänase filmikaadri ära!`:`Tänane kaader oli tõeline pähkel!`}\n${window.location.origin}/#/daily`;document.querySelector(`[data-share-copy]`)?.addEventListener(`click`,()=>{E(e)}),document.querySelector(`[data-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/daily`)}&text=${encodeURIComponent(e)}`,`_blank`)}),document.querySelector(`[data-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(e)}`,`_blank`)})}else{let e=document.querySelector(`[data-daily-form]`);e?.addEventListener(`submit`,async r=>{r.preventDefault();let o=e.querySelector(`input[name="guess"]`).value.trim();if(o)try{let e=await l(`/api/daily/guess`,{method:`POST`,body:JSON.stringify({guess:o})});i.guesses.push(o),e.isCorrect?(i.isSolved=!0,i.isOver=!0,i.resultInfo=e,localStorage.setItem(`filmisfaar_streak`,String(a+1))):i.guesses.length>=t.maxAttempts&&(i.isOver=!0,i.resultInfo={title:t.hints[0]?`Katsed lõppesid`:`Film arhiivist`,year:`Tundmatu`,director:`Tundmatu`,fact:`Vaata homme uuesti ja pane end uuesti proovile!`},localStorage.setItem(`filmisfaar_streak`,`0`)),localStorage.setItem(n,JSON.stringify(i)),s()}catch(e){T(e.message)}})}};s()}async function O(){let t;try{t=await l(`/api/quiz`)}catch{_(`<section class="game-page"><p class="comment-empty">Viktoriini laadimine ebaõnnestus.</p></section>`,`quiz`);return}let n=0,r=[],i=()=>{if(n<t.questions.length){let a=t.questions[n],o=Math.round((n+1)/t.questions.length*100);_(`
         <section class="game-page">
           <div class="game-header reveal">
             <p class="eyebrow">Kinematograafiline test</p>
@@ -301,4 +315,118 @@
             </div>
           </div>
         </section>
-      `,`quiz`),document.querySelector(`[data-quiz-share-copy]`)?.addEventListener(`click`,()=>{T(c)}),document.querySelector(`[data-quiz-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/quiz`)}&text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-restart]`)?.addEventListener(`click`,()=>{n=0,r.length=0,i()})}};i()}async function O(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}if(e===`/daily`){await E(),window.scrollTo(0,0);return}if(e===`/quiz`){await D(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,O),O();
+      `,`quiz`),document.querySelector(`[data-quiz-share-copy]`)?.addEventListener(`click`,()=>{E(c)}),document.querySelector(`[data-quiz-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/quiz`)}&text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-restart]`)?.addEventListener(`click`,()=>{n=0,r.length=0,i()})}};i()}async function k(){let t;try{t=await l(`/api/atlas`)}catch{_(`<section class="game-page"><p class="comment-empty">Kinoatlase laadimine ebaõnnestus.</p></section>`,`atlas`);return}let n=`Kõik`,r=new Set;if(a)try{let e=await l(`/api/watchlist`);r=new Set((e.items||[]).filter(e=>e.status===`watched`||e.status===`favorite`).map(e=>e.article_slug))}catch{}let i=()=>{let o=n===`Kõik`?t.milestones:t.milestones.filter(e=>e.country===n),s=t.milestones.filter(e=>e.articleSlug&&r.has(e.articleSlug)).length;_(`
+      <section class="atlas-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Kinematograafiline geograafia ja ajalugu</p>
+          <h1>Kinoatlas <em>1895—tänapäevani</em></h1>
+          <p>Rända läbi kinoloo pöördeliste ajastute, riikide ja liikumiste. Vaata, kuidas liikuva pildi kunst levis Pariisi kohvikutest Hollywoodi stuudiotesse ja sealt üle terve maailma.</p>
+          ${a?`
+            <div class="game-stats-badge">🏛️ Avastatud Filmisfääri ajastud: ${s} / 3</div>
+          `:``}
+        </div>
+
+        <div class="atlas-filters reveal">
+          ${t.countries.map(t=>`
+            <button class="atlas-filter-btn ${t===n?`active`:``}" type="button" data-country="${e(t)}">${e(t)}</button>
+          `).join(``)}
+        </div>
+
+        <div class="atlas-timeline">
+          ${o.map(t=>`
+            <div class="atlas-node reveal">
+              <div class="atlas-dot"></div>
+              <img class="atlas-node-img" src="${e(t.image)}" alt="${e(t.title)}" />
+              <div class="atlas-node-content">
+                <div class="atlas-node-meta">
+                  <span class="year-pill">${e(t.year)}</span>
+                  <span class="country-pill">${e(t.country)}</span>
+                  <span class="movement-pill">${e(t.movement)}</span>
+                  <span>${e(t.period)}</span>
+                </div>
+                <h3>${e(t.title)}</h3>
+                <p class="atlas-node-desc">${e(t.summary)}</p>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:6px;"><strong>Lavastajad / Peategelased:</strong> ${e(t.director)}</div>
+                <div class="atlas-node-fact">${e(t.fact)}</div>
+                ${t.articleSlug?`
+                  <p style="margin-top:14px;">
+                    <a class="text-link" href="#/article/${e(t.articleSlug)}">Loe pikemat artiklit Filmisfääris <span>↗</span></a>
+                  </p>
+                `:``}
+              </div>
+            </div>
+          `).join(``)}
+        </div>
+      </section>
+    `,`atlas`),document.querySelectorAll(`[data-country]`).forEach(e=>{e.addEventListener(`click`,()=>{n=e.dataset.country,i()})})};i()}async function A(){if(!a){_(`
+      <section class="watchlist-page">
+        <div class="auth-cta-box reveal">
+          <p class="eyebrow">Isiklik kinoteek</p>
+          <h2>Sinu personaalne filmiloo arhiiv</h2>
+          <p>Märgi filme ja artikleid vaadatuks, koosta isiklikke soovinimekirju, hinda klassikuid ning teeni kinomaani aumärke.</p>
+          <div style="display:flex; justify-content:center; gap:12px;">
+            <button class="auth-submit" type="button" data-auth="login">Logi sisse <span>↗</span></button>
+            <button class="auth-submit" style="background:var(--ink);" type="button" data-auth="register">Loo konto <span>↗</span></button>
+          </div>
+        </div>
+      </section>
+    `,`watchlist`);return}let t;try{t=await l(`/api/watchlist`)}catch{_(`<section class="watchlist-page"><p class="comment-empty">Watchlisti laadimine ebaõnnestus.</p></section>`,`watchlist`);return}let n=`all`,r=()=>{let i=t.stats||{total:0,watchedCount:0,wantCount:0,favoriteCount:0,progressPercent:0},a=t.items||[],s=t.badges||[],c=a.filter(e=>n===`all`||e.status===n);_(`
+      <section class="watchlist-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Minu kinoteek</p>
+          <h1>Isiklik <em>filmiloo arhiiv</em></h1>
+          <p>Halda oma vaadatud ja kavas olevaid filmikunsti pärle, jälgi oma edusamme ja teeni kinoloo aumärke.</p>
+        </div>
+
+        <div class="watchlist-stats-grid reveal">
+          <div class="stat-box"><strong>${i.total}</strong><span>Kokku salvestatud</span></div>
+          <div class="stat-box"><strong>${i.watchedCount}</strong><span>Vaadatud 👁️</span></div>
+          <div class="stat-box"><strong>${i.favoriteCount}</strong><span>Lemmikud ⭐</span></div>
+          <div class="stat-box"><strong>${i.progressPercent}%</strong><span>Ajastute läbivus</span></div>
+        </div>
+
+        ${s.length?`
+          <div class="badges-section reveal">
+            <div class="badges-title">Kogutud aumärgid (${s.length})</div>
+            <div class="badges-grid">
+              ${s.map(t=>`
+                <div class="badge-card">
+                  <span class="badge-icon">🎖️</span>
+                  <div class="badge-info">
+                    <strong>${e(t.name)}</strong>
+                    <small>${e(t.desc)}</small>
+                  </div>
+                </div>
+              `).join(``)}
+            </div>
+          </div>
+        `:``}
+
+        <div class="watchlist-tabs">
+          <button class="wl-tab ${n===`all`?`active`:``}" type="button" data-wltab="all">Kõik (${i.total})</button>
+          <button class="wl-tab ${n===`want`?`active`:``}" type="button" data-wltab="want">Soovin vaadata (${i.wantCount})</button>
+          <button class="wl-tab ${n===`watched`?`active`:``}" type="button" data-wltab="watched">Vaadatud (${i.watchedCount})</button>
+          <button class="wl-tab ${n===`favorite`?`active`:``}" type="button" data-wltab="favorite">Lemmikud (${i.favoriteCount})</button>
+        </div>
+
+        <div class="watchlist-grid">
+          ${c.length?c.map(t=>{let n=o[t.article_slug]||{title:t.article_slug,subtitle:``,image:``,year:``};return`
+              <div class="wl-item-card reveal">
+                <img class="wl-item-poster" src="${e(n.image||`https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80`)}" alt="${e(n.title)}" />
+                <div class="wl-item-info">
+                  <div class="wl-item-meta">
+                    <span class="wl-status-badge ${e(t.status)}">${{want:`Soovin vaadata 🔖`,watched:`Vaadatud 👁️`,favorite:`Lemmik ⭐`}[t.status]||t.status}</span>
+                    <span>${e(n.year)}</span>
+                  </div>
+                  <h3><a href="#/article/${e(t.article_slug)}">${e(n.title)}</a></h3>
+                  <p style="margin:0; font-size:13px; color:var(--muted);">${e(n.subtitle)}</p>
+                </div>
+                <div class="wl-item-actions">
+                  <a class="text-link" href="#/article/${e(t.article_slug)}">Vaata artiklit <span>↗</span></a>
+                  <button class="wl-delete-btn" type="button" data-wl-delete="${e(t.article_slug)}">Eemalda arhiivist ×</button>
+                </div>
+              </div>
+            `}).join(``):`<p class="tag-empty">Selles kategoorias pole veel ühtegi kirjet. Ava mõni artikkel ja lisa see oma arhiivi!</p>`}
+        </div>
+      </section>
+    `,`watchlist`),document.querySelectorAll(`[data-wltab]`).forEach(e=>{e.addEventListener(`click`,()=>{n=e.dataset.wltab,r()})}),document.querySelectorAll(`[data-wl-delete]`).forEach(e=>{e.addEventListener(`click`,async()=>{let n=e.dataset.wlDelete;try{await l(`/api/watchlist/${n}`,{method:`DELETE`}),t=await l(`/api/watchlist`),T(`Kirje eemaldatud arhiivist!`),r()}catch(e){T(e.message)}})})};r()}async function j(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}if(e===`/atlas`){await k(),window.scrollTo(0,0);return}if(e===`/watchlist`){await A(),window.scrollTo(0,0);return}if(e===`/daily`){await D(),window.scrollTo(0,0);return}if(e===`/quiz`){await O(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,j),j();

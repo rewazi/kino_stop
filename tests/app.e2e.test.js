@@ -80,6 +80,7 @@ class E2EDatabase {
     this.nextArticleId = 3;
     this.nextTagId = 4;
     this.nextCommentId = 2;
+    this.watchlist = [];
   }
 
   async execute(sql, params = []) {
@@ -272,6 +273,26 @@ class E2EDatabase {
       return [sorted.map((c) => ({ ...c }))];
     }
 
+    if (normalized.includes('FROM watchlist WHERE user_id = ?')) {
+      const userId = Number(params[0]);
+      const matched = (this.watchlist || []).filter((w) => w.user_id === userId);
+      return [matched.map((w) => ({ ...w }))];
+    }
+
+    if (normalized.startsWith('INSERT INTO watchlist')) {
+      const [userId, slug, status, rating, notes] = params;
+      if (!this.watchlist) this.watchlist = [];
+      const existing = this.watchlist.find((w) => w.user_id === Number(userId) && w.article_slug === String(slug));
+      if (existing) {
+        existing.status = status;
+        existing.rating = rating;
+        existing.notes = notes;
+      } else {
+        this.watchlist.push({ id: 1, user_id: Number(userId), article_slug: String(slug), status, rating, notes });
+      }
+      return [{ affectedRows: 1, insertId: 1 }];
+    }
+
     return [{ affectedRows: 1, insertId: 1 }];
   }
 }
@@ -450,6 +471,19 @@ describe('Visuaalne End-to-End (E2E) brauseritest — kasutajaliidese läbimine'
     await page.waitForURL(`${baseUrl}/#/quiz`);
     await page.waitForSelector('.quiz-question-box');
     expect(await page.locator('.quiz-question-text').isVisible()).toBe(true);
+
+    // SAMM 14: Kinoatlase vaate testimine
+    await page.locator('[data-route="atlas"]').click();
+    await page.waitForURL(`${baseUrl}/#/atlas`);
+    await page.waitForSelector('.atlas-timeline');
+    expect(await page.locator('.atlas-timeline').isVisible()).toBe(true);
+    expect(await page.locator('.atlas-node').count()).toBeGreaterThanOrEqual(8);
+
+    // SAMM 15: Watchlist / Minu nimekiri vaate testimine
+    await page.locator('[data-route="watchlist"]').click();
+    await page.waitForURL(`${baseUrl}/#/watchlist`);
+    await page.waitForSelector('.watchlist-stats-grid');
+    expect(await page.locator('.watchlist-stats-grid').isVisible()).toBe(true);
 
     // Lühike paus, et kasutaja jõuaks näha viimast vaadet
     await page.waitForTimeout(1000);

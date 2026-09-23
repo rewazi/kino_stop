@@ -153,6 +153,24 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    await adminConnection.query(`
+      CREATE TABLE IF NOT EXISTS watchlist (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id INT UNSIGNED NOT NULL,
+        article_slug VARCHAR(80) NOT NULL,
+        status ENUM('want', 'watched', 'favorite') NOT NULL DEFAULT 'want',
+        rating TINYINT UNSIGNED DEFAULT NULL,
+        notes TEXT DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY user_article_unique (user_id, article_slug),
+        KEY idx_watchlist_user (user_id),
+        KEY idx_watchlist_slug (article_slug),
+        CONSTRAINT fk_watchlist_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     await seedDefaultArticles();
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@filmisfaar.local';

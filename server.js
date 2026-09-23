@@ -13,6 +13,8 @@ import { pool, initializeDatabase } from './api/config.js';
 import { MySQLSessionStore } from './api/sessionStore.js';
 import { getDailyChallengeHandler, guessDailyChallengeHandler } from './api/daily.js';
 import { getQuizHandler } from './api/quiz.js';
+import { getWatchlistHandler, saveWatchlistHandler, deleteWatchlistHandler } from './api/watchlist.js';
+import { getAtlasHandler } from './api/atlas.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
@@ -55,6 +57,12 @@ app.get('/api/articles', getArticlesHandler);
 app.get('/api/daily', getDailyChallengeHandler);
 app.post('/api/daily/guess', guessDailyChallengeHandler);
 app.get('/api/quiz', getQuizHandler);
+
+// KINOATLAS JA WATCHLIST
+app.get('/api/atlas', getAtlasHandler);
+app.get('/api/watchlist', getWatchlistHandler);
+app.post('/api/watchlist', saveWatchlistHandler);
+app.delete('/api/watchlist/:articleSlug', deleteWatchlistHandler);
 
 app.get('/api/admin/articles', adminArticlesHandler);
 app.post('/api/admin/articles', adminArticlesHandler);
