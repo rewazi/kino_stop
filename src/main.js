@@ -1,5 +1,15 @@
 import './style.css';
 
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const articles = {
   silent: {
     section: '01 / Algused',
@@ -164,7 +174,7 @@ function updateAuthArea(user) {
     const isAdmin = user && user.role === 'admin';
     area.innerHTML = user
       ? `
-        <span class="user-name">${user.name}</span>
+        <span class="user-name">${escapeHtml(user.name)}</span>
         ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Admin</a>' : ''}
         <button class="auth-button" data-auth-logout>Logi välja</button>
       `
@@ -233,7 +243,7 @@ function home() {
       <div class="hero-poster reveal"><div class="poster-image"></div><div class="poster-label"><span>THE</span><strong>SEVENTH<br>SENSE</strong><small>Frames from a century</small></div><span class="poster-year">1895</span></div>
     </section>
     <section class="intro-band"><p class="section-kicker">Kolm pöördelist hetke</p><p class="intro-text">Esimesest filmilindi virvendusest digitaalsete maailmadeni — kino on iga kord muutnud mitte ainult ekraani, vaid ka meid.</p></section>
-    <section class="timeline-preview"><div class="timeline-line"></div>${Object.entries(articleStore).map(([key, article], index) => `<a class="timeline-card reveal" href="#/article/${key}"><span class="card-index">${String(index + 1).padStart(2, '0')}</span><div><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></div></a>`).join('')}</section>
+    <section class="timeline-preview"><div class="timeline-line"></div>${Object.entries(articleStore).map(([key, article], index) => `<a class="timeline-card reveal" href="#/article/${key}"><span class="card-index">${String(index + 1).padStart(2, '0')}</span><div><span class="card-year">${escapeHtml(article.year)}</span><h2>${escapeHtml(article.title)}</h2><p>${escapeHtml(article.subtitle)}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('')}</div><span class="arrow">↗</span></div></a>`).join('')}</section>
   `);
 }
 
@@ -250,7 +260,7 @@ function tagsPage() {
       <input class="tag-search" type="search" data-tag-search placeholder="Otsi märksõna järgi...">
       <div class="tag-filter-list" data-tag-filters>
         <button class="tag-filter active" type="button" data-tag-filter="">Kõik artiklid</button>
-        ${allTags.map((tag) => `<button class="tag-filter" type="button" data-tag-filter="${tag}">${tag}</button>`).join('')}
+        ${allTags.map((tag) => `<button class="tag-filter" type="button" data-tag-filter="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`).join('')}
       </div>
       <div class="tag-results" data-tag-results></div>
     </section>
@@ -262,7 +272,7 @@ function tagsPage() {
 
   const renderList = (entries) => {
     results.innerHTML = entries.length
-      ? entries.map(([key, article]) => `<a class="tag-result reveal" href="#/article/${key}"><span class="card-year">${article.year}</span><h2>${article.title}</h2><p>${article.subtitle}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><span class="arrow">↗</span></a>`).join('')
+      ? entries.map(([key, article]) => `<a class="tag-result reveal" href="#/article/${key}"><span class="card-year">${escapeHtml(article.year)}</span><h2>${escapeHtml(article.title)}</h2><p>${escapeHtml(article.subtitle)}</p><div class="article-tags">${(article.tags || []).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('')}</div><span class="arrow">↗</span></a>`).join('')
       : '<p class="tag-empty">Selle sildiga (või otsingusõnaga) artikleid veel ei ole.</p>';
   };
 
@@ -372,12 +382,12 @@ async function layoutAdmin() {
               ${(commentsData.comments || []).map((comment) => `
                 <li>
                   <div>
-                    <strong>${comment.name}</strong>
-                    <span>${comment.article_key}</span>
+                    <strong>${escapeHtml(comment.name)}</strong>
+                    <span>${escapeHtml(comment.article_key)}</span>
                     <small>${new Date(comment.created_at).toLocaleString('et-EE')}</small>
                   </div>
-                  <p>${comment.text}</p>
-                  <button data-delete-comment="${comment.id}">Kustuta</button>
+                  <p>${escapeHtml(comment.text)}</p>
+                  <button data-delete-comment="${escapeHtml(comment.id)}">Kustuta</button>
                 </li>
               `).join('') || '<li>Kommentaare pole.</li>'}
             </ul>
@@ -534,8 +544,8 @@ async function renderCommentsFromState() {
             const isOwn = currentUser && comment.user_id === currentUser.id;
             return `
             <article class="comment-item" data-comment-id="${comment.id}">
-              <div class="comment-meta"><strong>${comment.name}</strong><time>${new Date(comment.created_at).toLocaleString('et-EE', { dateStyle: 'short', timeStyle: 'short' })}</time></div>
-              <p data-comment-text>${comment.text}</p>
+              <div class="comment-meta"><strong>${escapeHtml(comment.name)}</strong><time>${new Date(comment.created_at).toLocaleString('et-EE', { dateStyle: 'short', timeStyle: 'short' })}</time></div>
+              <p data-comment-text>${escapeHtml(comment.text)}</p>
               ${isOwn ? `
                 <div class="comment-own-actions">
                   <button type="button" data-comment-edit>Muuda</button>
@@ -588,7 +598,7 @@ async function renderCommentsFromState() {
       const currentText = textEl.textContent;
       textEl.outerHTML = `
         <form class="comment-edit-form" data-comment-edit-form>
-          <textarea maxlength="500" rows="3" required>${currentText}</textarea>
+          <textarea maxlength="500" rows="3" required>${escapeHtml(currentText)}</textarea>
           <div class="comment-actions">
             <button type="submit">Salvesta</button>
             <button type="button" data-comment-cancel-edit>Loobu</button>
@@ -632,9 +642,9 @@ function articlePage(key) {
   const article = articleStore[key] || articleStore.silent;
   layout(`
     <article class="article-page">
-      <div class="article-heading reveal"><p class="eyebrow">${article.section}</p><h1>${article.title}</h1><p class="article-subtitle">${article.subtitle}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${tag}</span>`).join('')}</div><div class="article-meta"><span>${article.year}</span><span>Lugemine / 04 min</span></div></div>
-      <div class="article-visual reveal"><img src="${article.image}" alt="Filmikaader" /><span class="image-caption">Kaader kui tunnistaja. Film kui jälg.</span></div>
-      <div class="article-grid"><div class="article-aside"><span class="vertical-label">FILMISFÄÄR / MÄRKMED</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${paragraph}</p>`).join('')}<aside class="fact"><span class="fact-label">Märkus arhiivist</span><p>${article.fact}</p></aside><a class="text-link" href="#/">Tagasi ajajoone juurde <span>↗</span></a>
+      <div class="article-heading reveal"><p class="eyebrow">${escapeHtml(article.section)}</p><h1>${escapeHtml(article.title)}</h1><p class="article-subtitle">${escapeHtml(article.subtitle)}</p><div class="article-tags article-tags-large">${(article.tags || []).map((tag) => `<span class="tag-chip">${escapeHtml(tag)}</span>`).join('')}</div><div class="article-meta"><span>${escapeHtml(article.year)}</span><span>Lugemine / 04 min</span></div></div>
+      <div class="article-visual reveal"><img src="${escapeHtml(article.image)}" alt="Filmikaader" /><span class="image-caption">Kaader kui tunnistaja. Film kui jälg.</span></div>
+      <div class="article-grid"><div class="article-aside"><span class="vertical-label">FILMISFÄÄR / MÄRKMED</span></div><div class="article-body">${article.body.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}<aside class="fact"><span class="fact-label">Märkus arhiivist</span><p>${escapeHtml(article.fact)}</p></aside><a class="text-link" href="#/">Tagasi ajajoone juurde <span>↗</span></a>
       <div class="comments-root" data-comments-root data-article-key="${key}"></div>
       </div></div>
     </article>

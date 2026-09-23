@@ -374,8 +374,8 @@ describe('Visuaalne End-to-End (E2E) brauseritest — kasutajaliidese läbimine'
     await page.waitForSelector('.user-name');
     expect(await page.locator('.user-name').textContent()).toBe('Marko Tamm');
 
-    // SAMM 6: Kommentaari kirjutamine ja postitamine
-    await page.locator('[data-comment-form] textarea').fill('Tõeliselt huvitav ja visuaalselt nauditav filmiloo ülevaade!');
+    // SAMM 6: Kommentaari kirjutamine ja postitamine (sh XSS ründekoodi testimine)
+    await page.locator('[data-comment-form] textarea').fill('Tõeliselt huvitav ja visuaalselt nauditav filmiloo ülevaade! <img src="valeaadress" onerror="window.__xss_executed=true">');
     await page.locator('[data-comment-form] button[type="submit"]').click();
 
     // Ootame uue kommentaari ilmumist nimekirja
@@ -383,6 +383,10 @@ describe('Visuaalne End-to-End (E2E) brauseritest — kasutajaliidese läbimine'
     await myComment.waitFor();
     expect(await myComment.isVisible()).toBe(true);
     expect(await myComment.locator('[data-comment-text]').textContent()).toContain('Tõeliselt huvitav');
+
+    // Veendume, et Stored XSS rünnak neutraliseeriti turvaliselt (skript ei käivitu brauseris)
+    const isXssExecuted = await page.evaluate(() => window.__xss_executed);
+    expect(isXssExecuted).toBeUndefined();
 
     // SAMM 7: Oma kommentaari muutmine (inline edit)
     await myComment.locator('[data-comment-edit]').click();
