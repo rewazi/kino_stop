@@ -756,5 +756,37 @@ describe('Täielik API integratsioonitestide komplekt', () => {
       expect(res.status).toBe(200);
       expect(res.headers['content-type']).toContain('text/html');
     });
+
+    it('käivitab serveri edukalt funktsiooniga startServer', async () => {
+      const { startServer } = await import('../server.js');
+      const listenSpy = vi.spyOn(app, 'listen').mockImplementation((port, cb) => {
+        if (cb) cb();
+        return { close: (fn) => fn && fn() };
+      });
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+
+      await startServer();
+
+      expect(listenSpy).toHaveBeenCalled();
+      listenSpy.mockRestore();
+      logSpy.mockRestore();
+    });
+
+    it('käsitleb andmebaasi initsialiseerimise viga funktsioonis startServer', async () => {
+      const { startServer } = await import('../server.js');
+      const { initializeDatabase } = await import('../api/config.js');
+      initializeDatabase.mockRejectedValueOnce(new Error('Andmebaasi ühenduse viga'));
+
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {});
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await startServer();
+
+      expect(errorSpy).toHaveBeenCalled();
+      expect(exitSpy).toHaveBeenCalledWith(1);
+
+      exitSpy.mockRestore();
+      errorSpy.mockRestore();
+    });
   });
 });
