@@ -162,6 +162,47 @@ Süsteemis on pärast käivitamist koheselt olemas administraatori konto:
 
 ---
 
+## 🖥️ Kasutusjuhend (Gaid koos piltidega)
+
+> [!TIP]
+> Täielik ja üksikasjalik ekraanitõmmistega kasutusjuhend asub eraldi dokumendis: **[docs/KASUTUSJUHEND.md](docs/KASUTUSJUHEND.md)**.
+
+### 1. Kinoloo ajajoon ja artiklite sirvimine
+Avalehel (`#/`) kuvatakse kino ajaloo peamised verstapostid. Kaardile klõpsates avaneb valitud ajastu detailne artikkel koos fotode, sisulõikude ja arhiivifaktiga.
+
+![Avaleht ja ajajoon](docs/screenshots/01_avaleht_ajajoon.png)
+
+### 2. Artikli detailvaade ja ajaloolised märkmed
+Artiklileht (`#/article/:slug`) esitleb filmiajastu olulisemaid uuendusi, arhiivimärkust ja kommentaariumi.
+
+![Artikli vaade](docs/screenshots/02_artikli_vaade.png)
+
+### 3. Kasutajakonto registreerimine ja sisselogimine
+Konto loomiseks vajutage päises nupule **„Registreeru“**. Sisestage oma nimi, unikaalne e-post ja parool (min 6 märki). Süsteem kasutab turvalist `bcrypt` parooliräsi ja kaitseb kontot brute-force rünnakute eest (5 katset -> 15 min blokeering).
+
+![Sisselogimise ja registreerumise dialoog](docs/screenshots/03_sisselogimise_aken.png)
+
+### 4. Kommenteerimine ja oma kommentaaride muutmine/kustutamine (CRUD)
+Registreeritud kasutajad saavad artiklite alla postitada arvamusi (2–500 tähemärki). Iga kasutaja saab **ainult enda** postitatud kommentaari muuta nupuga **„Muuda“** või eemaldada nupuga **„Kustuta“**.
+
+![Kommenteerimine ja CRUD](docs/screenshots/04_kommenteerimine_ja_crud.png)
+
+### 5. Teemade arhiiv ja reaalajas otsing
+Lehel **„Sildid“ (`#/tags`)** saab filtreerida artikleid teemade järgi ühe klikiga või teostada reaalajas otsingut märksõna järgi, mis otsib korraga pealkirjadest, lühikirjeldustest ja sisutekstidest.
+
+![Sildid ja otsing](docs/screenshots/05_sildid_ja_otsing.png)
+
+### 6. Administraatori halduspaneel (`#/admin`)
+Administraatorina (`admin@filmisfaar.local`) sisse logides ilmub päisesse nupp **„Admin“**. Halduspaneel võimaldab:
+* Lisada uusi artikleid (slug, pealkiri, tekstilõigud, fakt, pilt);
+* Muuta olemasolevate artiklite teksti ja fakte;
+* Luua uusi silte ning siduda neid artiklitega;
+* Modereerida (kustutada) ebasobivaid kommentaare.
+
+![Administraatori halduspaneel](docs/screenshots/06_administraatori_halduspaneel.png)
+
+---
+
 ## 📋 Nõuete spetsifikatsioon ja jälgitavus (ISO/IEC/IEEE 29148:2018)
 
 Projekti analüüs, nõuete haldus ja funktsionaalsuse verifitseerimine järgivad rahvusvahelist tarkvaranõuete inseneriteaduse standardit **ISO/IEC/IEEE 29148:2018** (*Systems and software engineering — Life cycle processes — Requirements engineering*).
@@ -254,6 +295,11 @@ my_project/
 ├── dist/                      # Kompileeritud staatiline esirakendus (toodang)
 │   ├── assets/                # Pakitud JS ja CSS failid
 │   └── index.html             # Esirakenduse peamine HTML
+├── docs/                      # Dokumentatsioon ja kasutajajuhendid
+│   ├── KASUTUSJUHEND.md       # Üksikasjalik illustreeritud kasutusjuhend
+│   └── screenshots/           # Kasutajaliidese ekraanitõmmised (PNG)
+├── scripts/                   # Arenduse abiskriptid (ekraanitõmmiste genereerimine)
+│   └── capture-screenshots.js # Automatiseeritud tõmmiste skript Playwrightiga
 ├── src/                       # Esirakenduse lähtekood
 │   ├── main.js                # Kliendipoolne SPA loogika, komponendid ja sündmused
 │   └── style.css              # Kujundus, animatsioonid ja kohalduv paigutus (responsive)
