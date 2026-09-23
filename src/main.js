@@ -160,35 +160,36 @@ function openAuth(mode = 'login') {
 function updateAuthArea(user) {
   currentUser = user;
   const area = document.querySelector('[data-auth-area]');
-  if (!area) return;
+  if (area) {
+    const isAdmin = user && user.role === 'admin';
+    area.innerHTML = user
+      ? `
+        <span class="user-name">${user.name}</span>
+        ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Admin</a>' : ''}
+        <button class="auth-button" data-auth-logout>Logi välja</button>
+      `
+      : '<button class="auth-button" data-auth="login">Logi sisse</button><button class="auth-button auth-button-primary" data-auth="register">Registreeru</button>';
 
-  const isAdmin = user && user.role === 'admin';
-  area.innerHTML = user
-    ? `
-      <span class="user-name">${user.name}</span>
-      ${isAdmin ? '<a class="auth-button" href="#/admin" data-admin-panel>Admin</a>' : ''}
-      <button class="auth-button" data-auth-logout>Logi välja</button>
-    `
-    : '<button class="auth-button" data-auth="login">Logi sisse</button><button class="auth-button auth-button-primary" data-auth="register">Registreeru</button>';
+    area.querySelectorAll('[data-auth]').forEach((button) => button.addEventListener('click', () => openAuth(button.dataset.auth)));
+    area.querySelector('[data-auth-logout]')?.addEventListener('click', async () => {
+      try {
+        await authRequest('logout', { method: 'POST', body: '{}' });
+        updateAuthArea(null);
+      } catch {
+        updateAuthArea(null);
+      }
+    });
 
-  area.querySelectorAll('[data-auth]').forEach((button) => button.addEventListener('click', () => openAuth(button.dataset.auth)));
-  area.querySelector('[data-auth-logout]')?.addEventListener('click', async () => {
-    try {
-      await authRequest('logout', { method: 'POST', body: '{}' });
-      updateAuthArea(null);
-      const activeCommentForm = document.querySelector('[data-comment-form]');
-      if (activeCommentForm) activeCommentForm.remove();
-      const activeComments = document.querySelector('[data-comments-root]');
-      if (activeComments) renderCommentsFromState();
-    } catch {
-      updateAuthArea(null);
-    }
-  });
+    area.querySelector('[data-admin-panel]')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.location.hash = '#/admin';
+    });
+  }
 
-  area.querySelector('[data-admin-panel]')?.addEventListener('click', (event) => {
-    event.preventDefault();
-    window.location.hash = '#/admin';
-  });
+  const activeComments = document.querySelector('[data-comments-root]');
+  if (activeComments) {
+    renderCommentsFromState();
+  }
 }
 
 function bindAuth() {
