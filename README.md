@@ -162,6 +162,46 @@ Süsteemis on pärast käivitamist koheselt olemas administraatori konto:
 
 ---
 
+## 📋 Nõuete spetsifikatsioon ja jälgitavus (ISO/IEC/IEEE 29148:2018)
+
+Projekti analüüs, nõuete haldus ja funktsionaalsuse verifitseerimine järgivad rahvusvahelist tarkvaranõuete inseneriteaduse standardit **ISO/IEC/IEEE 29148:2018** (*Systems and software engineering — Life cycle processes — Requirements engineering*).
+
+> [!NOTE]
+> Täismahus formaalne spetsifikatsioon koos arhitektuuri ja piirangutega asub dokumendis: **[REQUIREMENTS_ISO_29148.md](REQUIREMENTS_ISO_29148.md)**.
+
+### Standardi rakendamine projektis:
+1. **Normatiivne nõuete lausestus:** Kõik funktsionaalsed nõuded on rangelt esitatud standardi nõuete kohaselt vormis **„Süsteem peab...”** (*The system shall...*).
+2. **Kvaliteedikriteeriumid (Characteristics):** Iga nõue on ühemõtteline, vajalik, teostatav ja 100% verifitseeritav automatiseeritud testidega.
+3. **Kahesuunaline jälgitavus (Bidirectional Traceability):** Igal nõudel on unikaalne kood (`FR-xx`, `NFR-xx`), mis seob nõude vastava koodikomponendi ja testjuhtumiga.
+
+### Nõuete ja verifitseerimise kiirmaatriks (Traceability Matrix):
+
+| Nõude ID | Nõude lühikirjeldus | Kategooria | Realisatsioon | Verifitseeriv testijuhtum |
+| :--- | :--- | :--- | :--- | :--- |
+| **FR-01** | Kasutaja registreerimine unikaalse e-postiga | Funktsionaalne | `api/register.js` | `tests/api.integration.test.js` -> registreerib uue kasutaja |
+| **FR-02** | Paroolide turvaline soolatud räsimine (bcrypt) | Turvalisus | `api/config.js` | `tests/config.unit.test.js` -> parooliräsi valideerimine |
+| **FR-03** | E-posti duplikaatide tõkestamine (409 Conflict) | Funktsionaalne | `api/register.js` | `tests/api.integration.test.js` -> tagastab 409 (ER_DUP_ENTRY) |
+| **FR-04** | Sisselogimine ja seanss (`HttpOnly` küpsised) | Turvalisus | `api/login.js` | `tests/api.integration.test.js` -> seansi loomine |
+| **FR-07** | Brute-force rünnakute tõkestus (5 katset -> 429) | Turvalisus | `api/login.js` | `tests/api.integration.test.js` -> 15 min blokeering |
+| **FR-08** | Kronoloogiline kinoloo ajajoon avalehel | Funktsionaalne | `src/main.js` | `tests/app.e2e.test.js` -> Samm 1 (Avaleht) |
+| **FR-09** | Artikli vaade pildi, teksti ja arhiivifaktiga | Funktsionaalne | `src/main.js` | `tests/app.e2e.test.js` -> Samm 2 (Artiklileht) |
+| **FR-11** | Siltide filtreerimine (`#/tags`) | Funktsionaalne | `src/main.js` | `tests/app.e2e.test.js` -> Samm 9 (Siltide filter) |
+| **FR-12** | Reaalajas märksõnaotsing (`/api/articles?q=`) | Funktsionaalne | `api/admin.js` | `tests/api.integration.test.js` -> otsingutestid |
+| **FR-13** | Kommentaaride lugemine (kõik külastajad) | Funktsionaalne | `api/comments.js` | `tests/api.integration.test.js` -> GET /api/comments |
+| **FR-14** | Uue kommentaari postitamine (2–500 tähemärki) | Funktsionaalne | `api/comments.js` | `tests/api.integration.test.js`, `tests/app.e2e.test.js` |
+| **FR-15** | Oma kommentaari muutmine (inline edit, PUT) | Funktsionaalne | `api/comments.js` | `tests/api.integration.test.js` -> PUT /api/comments/entry/:id |
+| **FR-16** | Oma kommentaari kustutamine (DELETE) | Funktsionaalne | `api/comments.js` | `tests/api.integration.test.js` -> DELETE /api/comments/entry/:id |
+| **FR-17** | Võõra kommentaari muutumiskaitse (403 Forbidden)| Turvalisus | `api/comments.js` | `tests/api.integration.test.js` -> 403 õiguste kontroll |
+| **FR-18** | Administraatori halduspaneeli autoriseerimine | Turvalisus | `api/admin.js` | `tests/api.integration.test.js` -> 401 volitamata päring |
+| **FR-19** | Uue artikli lisamine administraatori poolt | Funktsionaalne | `api/admin.js` | `tests/api.integration.test.js` -> POST /api/admin/articles |
+| **FR-20** | Artikli sisu muutmine administraatori poolt | Funktsionaalne | `api/admin.js` | `tests/api.integration.test.js` -> PUT /api/admin/articles/:id |
+| **FR-21** | Siltide lisamine, sidumine ja kustutamine | Funktsionaalne | `api/admin.js` | `tests/api.integration.test.js` -> siltide haldus |
+| **FR-22** | Modereerimine (kommentaari kustutamine adminina) | Funktsionaalne | `api/admin.js` | `tests/api.integration.test.js` -> DELETE /api/admin/comments/:id |
+| **NFR-04** | API otspunktide madal latentsusaeg (< 100 ms) | Jõudlus | Node/Express | `tests/api.integration.test.js` -> kiire reageerimisaeg |
+| **NFR-07** | 100% funktsioonide testikaetus | Hooldatavus | Kogu projekt | `npm test` -> 43/43 testi läbitud, 100% Funcs kaetus |
+
+---
+
 ## 🧪 Automatiseeritud testide käivitamine
 
 Projektis on põhjalik, kolmetasemeline testide komplekt (ühiktestid, integratsioonitestid ja E2E testid), mis kontrollivad rakenduse kõiki funktsioone ja turvareegleid.
@@ -226,6 +266,8 @@ my_project/
 ├── database.sql               # MySQL andmebaasi skeem ja tabelite loomise skript
 ├── index.html                 # Kliendirakenduse HTML algallikas Vite jaoks
 ├── package.json               # Projekti metainfo, skriptid ja sõltuvused
+├── README.md                  # Projekti peamine paigaldus- ja kasutusjuhend
+├── REQUIREMENTS_ISO_29148.md  # Nõuete spetsifikatsioon (ISO/IEC/IEEE 29148:2018)
 ├── server.js                  # Express veebiserver ja marsruutimine
 └── vitest.config.js           # Vitest testiraamistiku seadistus
 ```
