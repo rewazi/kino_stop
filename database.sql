@@ -68,6 +68,23 @@ CREATE TABLE IF NOT EXISTS sessions (
   KEY idx_sessions_expires (expires)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS daily_challenges (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  challenge_date DATE NOT NULL,
+  title VARCHAR(180) NOT NULL,
+  year VARCHAR(20) NOT NULL,
+  director VARCHAR(120) NOT NULL,
+  image TEXT NOT NULL,
+  hint1 TEXT NOT NULL,
+  hint2 TEXT NOT NULL,
+  hint3 TEXT NOT NULL,
+  hint4 TEXT NOT NULL,
+  article_slug VARCHAR(80) DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY daily_date_unique (challenge_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO users (name, email, password_hash, role)
 SELECT 'Administraator', 'admin@filmisfaar.local', '$2a$12$JjT4.ZA4Az0HsmM4gF2UJeoLsGZb1M7hZ0uGzW7tOa2nqXqZ2B1PK', 'admin'
 WHERE NOT EXISTS (

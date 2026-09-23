@@ -134,6 +134,25 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    await adminConnection.query(`
+      CREATE TABLE IF NOT EXISTS daily_challenges (
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        challenge_date DATE NOT NULL,
+        title VARCHAR(180) NOT NULL,
+        year VARCHAR(20) NOT NULL,
+        director VARCHAR(120) NOT NULL,
+        image TEXT NOT NULL,
+        hint1 TEXT NOT NULL,
+        hint2 TEXT NOT NULL,
+        hint3 TEXT NOT NULL,
+        hint4 TEXT NOT NULL,
+        article_slug VARCHAR(80) DEFAULT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY daily_date_unique (challenge_date)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     await seedDefaultArticles();
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@filmisfaar.local';

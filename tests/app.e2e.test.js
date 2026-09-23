@@ -438,6 +438,19 @@ describe('Visuaalne End-to-End (E2E) brauseritest — kasutajaliidese läbimine'
     expect(await page.locator('.admin-card h2', { hasText: 'Lisa artikkel' }).isVisible()).toBe(true);
     expect(await page.getByRole('heading', { name: 'Sildid', exact: true }).isVisible()).toBe(true);
 
+    // SAMM 12: Kaader Päevas vaate testimine
+    await page.locator('[data-route="daily"]').click();
+    await page.waitForURL(`${baseUrl}/#/daily`);
+    await page.waitForSelector('.daily-frame-wrapper');
+    expect(await page.locator('.daily-frame-wrapper').isVisible()).toBe(true);
+    expect(await page.locator('input[name="guess"]').isVisible()).toBe(true);
+
+    // SAMM 13: Kinoarhetüübi testi vaate testimine
+    await page.locator('[data-route="quiz"]').click();
+    await page.waitForURL(`${baseUrl}/#/quiz`);
+    await page.waitForSelector('.quiz-question-box');
+    expect(await page.locator('.quiz-question-text').isVisible()).toBe(true);
+
     // Lühike paus, et kasutaja jõuaks näha viimast vaadet
     await page.waitForTimeout(1000);
   }, 45000);

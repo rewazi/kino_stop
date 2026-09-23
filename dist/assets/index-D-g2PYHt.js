@@ -6,6 +6,8 @@
       <a href="#/article/silent" data-route="silent">Tummfilm</a>
       <a href="#/article/nouvelle" data-route="nouvelle">Uus laine</a>
       <a href="#/article/blockbuster" data-route="blockbuster">Kassahitid</a>
+      <a href="#/daily" data-route="daily">Kaader päevas</a>
+      <a href="#/quiz" data-route="quiz">Kinoarhetüüp</a>
       <a href="#/tags" data-route="tags">Sildid</a>
     </nav>
     <div class="auth-area" data-auth-area><button class="auth-button" data-auth="login">Logi sisse</button><button class="auth-button auth-button-primary" data-auth="register">Registreeru</button></div>
@@ -178,4 +180,125 @@
       <div class="comments-root" data-comments-root data-article-key="${t}"></div>
       </div></div>
     </article>
-  `,t),S()}async function w(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,w),w();
+  `,t),S()}function w(e){let t=document.querySelector(`.toast-notice`);t&&t.remove();let n=document.createElement(`div`);n.className=`toast-notice`,n.textContent=e,document.body.appendChild(n),setTimeout(()=>{n.parentNode&&n.remove()},2600)}async function T(e,t=`Tulemus kopeeritud lõikelauale! 📋`){try{if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(e);else{let t=document.createElement(`textarea`);t.value=e,document.body.appendChild(t),t.select(),document.execCommand(`copy`),t.remove()}w(t)}catch{w(`Kopeerimine ebaõnnestus.`)}}async function E(){let t;try{t=await l(`/api/daily`)}catch{_(`<section class="game-page"><p class="comment-empty">Päeva kaadrit ei õnnestunud laadida. Kontrolli võrguühendust.</p></section>`,`daily`);return}let n=`filmisfaar_daily_${t.date}`,r=localStorage.getItem(n),i=r?JSON.parse(r):{guesses:[],isSolved:!1,isOver:!1,resultInfo:null},a=Number(localStorage.getItem(`filmisfaar_streak`)||0),o=()=>i.guesses.map((e,t)=>i.isSolved&&t===i.guesses.length-1?`🟩`:`🟥`).concat(Array(Math.max(0,5-i.guesses.length)).fill(`⬛`)).join(``),s=()=>{let r=Array.from({length:5}).map((t,n)=>{let r=i.guesses[n];if(r){let t=i.isSolved&&n===i.guesses.length-1;return`<div class="attempt-slot ${t?`correct`:`wrong`}">${n+1}. ${e(r)} ${t?`✓`:`✗`}</div>`}return`<div class="attempt-slot ${n===i.guesses.length&&!i.isOver?`active`:``}">${n+1}. —</div>`}).join(``),c=t.hints.map((t,n)=>{let r=i.guesses.length>n||i.isOver;return`
+        <div class="hint-item">
+          <span class="hint-badge">Vihje ${n+1}</span>
+          <span class="${r?``:`hint-locked`}">${r?e(t):`Lukus (avaneb pärast `+(n+1)+`. katset)`}</span>
+        </div>
+      `}).join(``),u=``;if(i.isOver&&(`${t.dayNumber}${o()}${i.isSolved?i.guesses.length:`X`}`,i.isSolved,`${window.location.origin}`,u=`
+        <div class="result-card reveal">
+          <h2>${i.isSolved?`Õige vastus! 🎬`:`Katsed said otsa!`}</h2>
+          ${i.resultInfo?`
+            <p><strong>${e(i.resultInfo.title)}</strong> (${e(i.resultInfo.year)}), rež. ${e(i.resultInfo.director)}</p>
+            ${i.resultInfo.fact?`<p class="intro-text" style="font-size:16px;">${e(i.resultInfo.fact)}</p>`:``}
+            ${i.resultInfo.articleSlug?`<p><a class="text-link" href="#/article/${e(i.resultInfo.articleSlug)}">Loe seotud artiklit Filmisfääris <span>↗</span></a></p>`:``}
+          `:``}
+          <div class="result-share-bar">
+            <button class="share-button" type="button" data-share-copy>Kopeeri tulemus 📋</button>
+            <button class="share-button share-button-secondary" type="button" data-share-tg>Jaga Telegramis ✈️</button>
+            <button class="share-button share-button-secondary" type="button" data-share-x>Jaga X-is 🐦</button>
+          </div>
+        </div>
+      `),_(`
+      <section class="game-page">
+        <div class="game-header reveal">
+          <p class="eyebrow">Igapäevane kino-väljakutse</p>
+          <h1>Kaader Päevas #<em>${t.dayNumber}</em></h1>
+          <p>Arva ära, millisest filmiajaloole märgiliseks saanud teosest see kaader pärineb. Sul on 5 katset, iga eksimusega avaneb uus vihje.</p>
+          <div class="game-stats-badge">🔥 Võiduseeria: ${a} ${a===1?`päev`:`päeva`}</div>
+        </div>
+
+        <div class="daily-frame-wrapper reveal">
+          <img class="daily-frame-image" src="${e(t.image)}" alt="Päeva filmikaader" />
+          <div class="daily-frame-overlay">#${t.dayNumber} • ${e(t.date)}</div>
+        </div>
+
+        <div class="daily-attempts-grid">
+          ${r}
+        </div>
+
+        ${i.isOver?``:`
+          <form class="daily-input-row" data-daily-form>
+            <input class="daily-input" type="text" list="titles-list" name="guess" placeholder="Sisesta filmi pealkiri..." autocomplete="off" required>
+            <datalist id="titles-list">
+              ${t.allTitles.map(t=>`<option value="${e(t)}">`).join(``)}
+            </datalist>
+            <button class="daily-submit" type="submit">Paku <span>↗</span></button>
+          </form>
+        `}
+
+        <div class="hints-section">
+          <div class="hints-title">Arhiivi vihjed</div>
+          <div class="hints-list">${c}</div>
+        </div>
+
+        ${u}
+      </section>
+    `,`daily`),i.isOver){let e=`🎬 Filmisfäär Kaader Päevas #${t.dayNumber}\n${o()} (${i.isSolved?i.guesses.length:`X`}/5)\n\n${i.isSolved?`Arvasin tänase filmikaadri ära!`:`Tänane kaader oli tõeline pähkel!`}\n${window.location.origin}/#/daily`;document.querySelector(`[data-share-copy]`)?.addEventListener(`click`,()=>{T(e)}),document.querySelector(`[data-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/daily`)}&text=${encodeURIComponent(e)}`,`_blank`)}),document.querySelector(`[data-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(e)}`,`_blank`)})}else{let e=document.querySelector(`[data-daily-form]`);e?.addEventListener(`submit`,async r=>{r.preventDefault();let o=e.querySelector(`input[name="guess"]`).value.trim();if(o)try{let e=await l(`/api/daily/guess`,{method:`POST`,body:JSON.stringify({guess:o})});i.guesses.push(o),e.isCorrect?(i.isSolved=!0,i.isOver=!0,i.resultInfo=e,localStorage.setItem(`filmisfaar_streak`,String(a+1))):i.guesses.length>=t.maxAttempts&&(i.isOver=!0,i.resultInfo={title:t.hints[0]?`Katsed lõppesid`:`Film arhiivist`,year:`Tundmatu`,director:`Tundmatu`,fact:`Vaata homme uuesti ja pane end uuesti proovile!`},localStorage.setItem(`filmisfaar_streak`,`0`)),localStorage.setItem(n,JSON.stringify(i)),s()}catch(e){w(e.message)}})}};s()}async function D(){let t;try{t=await l(`/api/quiz`)}catch{_(`<section class="game-page"><p class="comment-empty">Viktoriini laadimine ebaõnnestus.</p></section>`,`quiz`);return}let n=0,r=[],i=()=>{if(n<t.questions.length){let a=t.questions[n],o=Math.round((n+1)/t.questions.length*100);_(`
+        <section class="game-page">
+          <div class="game-header reveal">
+            <p class="eyebrow">Kinematograafiline test</p>
+            <h1>Mis tüüpi <em>filmilooja</em> oled sina?</h1>
+            <p>Vasta 5 visuaalsele ja esteetilisele küsimusele, et avastada oma kinematograafiline arhetüüp ja saada soovitusi Filmisfääri arhiivist.</p>
+          </div>
+
+          <div class="quiz-progress">
+            <span>Küsimus ${n+1} / ${t.questions.length}</span>
+            <span>${o}%</span>
+          </div>
+          <div class="quiz-progress-bar-wrap">
+            <div class="quiz-progress-bar-fill" style="width: ${o}%;"></div>
+          </div>
+
+          <div class="quiz-question-box reveal">
+            <h2 class="quiz-question-text">${e(a.text)}</h2>
+            <div class="quiz-options-list">
+              ${a.options.map((t,n)=>`
+                <button class="quiz-option-button" type="button" data-archetype="${e(t.archetype)}">
+                  <span class="quiz-option-index">${String.fromCharCode(65+n)}</span>
+                  <span>${e(t.text)}</span>
+                </button>
+              `).join(``)}
+            </div>
+          </div>
+        </section>
+      `,`quiz`),document.querySelectorAll(`[data-archetype]`).forEach(e=>{e.addEventListener(`click`,()=>{r.push(e.dataset.archetype),n++,i()})})}else{let a={};r.forEach(e=>{a[e]=(a[e]||0)+1});let o=Object.entries(a).sort((e,t)=>t[1]-e[1])[0]?.[0]||`nouvelle`,s=t.archetypes[o]||t.archetypes.nouvelle,c=`🎭 Minu Filmisfääri kinoarhetüüp on: „${s.title}“!\n${s.motto}\n\nUuri välja oma arhetüüp siin:\n${window.location.origin}/#/quiz`;_(`
+        <section class="game-page">
+          <div class="game-header reveal">
+            <p class="eyebrow">Sinu testi tulemus</p>
+            <h1>Sinu kinoarhetüüp on <em>${e(s.title)}</em></h1>
+          </div>
+
+          <div class="archetype-result reveal">
+            <img class="archetype-poster" src="${e(s.image)}" alt="${e(s.title)}" />
+            <div class="archetype-details">
+              <h2>${e(s.title)}</h2>
+              <div class="archetype-subtitle">${e(s.subtitle)}</div>
+              <div class="archetype-motto">${e(s.motto)}</div>
+              <p class="archetype-desc">${e(s.description)}</p>
+              
+              <div class="hints-title" style="margin-top:18px;">Tugevused ja jooned:</div>
+              <div class="archetype-traits">
+                ${s.strengths.map(t=>`<span class="trait-tag">${e(t)}</span>`).join(``)}
+              </div>
+
+              <p style="margin-top:18px; font-size:13px; color:var(--muted);">
+                <strong>Hingesugulased lavastajatoolis:</strong> ${e(s.directors)}
+              </p>
+
+              ${s.relatedSlug?`
+                <p style="margin-top:16px;">
+                  <a class="text-link" href="#/article/${e(s.relatedSlug)}">Uuri selle ajastu artiklit Filmisfääris <span>↗</span></a>
+                </p>
+              `:``}
+
+              <div class="result-share-bar">
+                <button class="share-button" type="button" data-quiz-share-copy>Kopeeri tulemus 📋</button>
+                <button class="share-button share-button-secondary" type="button" data-quiz-share-tg>Jaga Telegramis ✈️</button>
+                <button class="share-button share-button-secondary" type="button" data-quiz-share-x>Jaga X-is 🐦</button>
+                <button class="share-button share-button-secondary" type="button" data-quiz-restart>Tee test uuesti ↺</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      `,`quiz`),document.querySelector(`[data-quiz-share-copy]`)?.addEventListener(`click`,()=>{T(c)}),document.querySelector(`[data-quiz-share-tg]`)?.addEventListener(`click`,()=>{window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin+`/#/quiz`)}&text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-share-x]`)?.addEventListener(`click`,()=>{window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(c)}`,`_blank`)}),document.querySelector(`[data-quiz-restart]`)?.addEventListener(`click`,()=>{n=0,r.length=0,i()})}};i()}async function O(){await d(!0);let e=window.location.hash.replace(`#`,``)||`/`;if(e===`/admin`){await b(),window.scrollTo(0,0);return}if(e===`/tags`){y(),window.scrollTo(0,0);return}if(e===`/daily`){await E(),window.scrollTo(0,0);return}if(e===`/quiz`){await D(),window.scrollTo(0,0);return}let t=e.match(/^\/article\/([^/]+)$/);t?C(t[1]):v(),window.scrollTo(0,0)}window.addEventListener(`hashchange`,O),O();

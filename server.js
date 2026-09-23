@@ -11,6 +11,8 @@ import { getCommentsHandler, createCommentHandler, updateOwnCommentHandler, dele
 import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminDeleteTagHandler, adminArticleTagsHandler, adminDeleteArticleTagHandler, getArticlesHandler } from './api/admin.js';
 import { pool, initializeDatabase } from './api/config.js';
 import { MySQLSessionStore } from './api/sessionStore.js';
+import { getDailyChallengeHandler, guessDailyChallengeHandler } from './api/daily.js';
+import { getQuizHandler } from './api/quiz.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
@@ -48,6 +50,11 @@ app.put('/api/comments/entry/:id', updateOwnCommentHandler);
 app.delete('/api/comments/entry/:id', deleteOwnCommentHandler);
 // UUS FUNKTSIONAALSUS 2: /api/articles toetab nüüd ?tag= ja ?q= otsinguparameetreid (vt api/admin.js)
 app.get('/api/articles', getArticlesHandler);
+
+// VIRAALSED FUNKTSIOONID: Kaader Päevas ja Kinoarhetüübi test
+app.get('/api/daily', getDailyChallengeHandler);
+app.post('/api/daily/guess', guessDailyChallengeHandler);
+app.get('/api/quiz', getQuizHandler);
 
 app.get('/api/admin/articles', adminArticlesHandler);
 app.post('/api/admin/articles', adminArticlesHandler);
