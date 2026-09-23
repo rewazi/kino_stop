@@ -9,14 +9,18 @@ import { loginHandler } from './api/login.js';
 import { logoutHandler } from './api/logout.js';
 import { getCommentsHandler, createCommentHandler, updateOwnCommentHandler, deleteOwnCommentHandler } from './api/comments.js';
 import { adminArticlesHandler, adminCommentsHandler, adminDeleteCommentHandler, adminTagsHandler, adminDeleteTagHandler, adminArticleTagsHandler, adminDeleteArticleTagHandler, getArticlesHandler } from './api/admin.js';
-import { initializeDatabase } from './api/config.js';
+import { pool, initializeDatabase } from './api/config.js';
+import { MySQLSessionStore } from './api/sessionStore.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const app = express();
 const port = Number(process.env.PORT || 3000);
 
+export const sessionStore = new MySQLSessionStore({ pool });
+
 app.use(express.json());
 app.use(session({
+  store: sessionStore,
   secret: process.env.SESSION_SECRET || 'filmisfaar-development-secret',
   resave: false,
   saveUninitialized: false,

@@ -60,6 +60,14 @@ CREATE TABLE IF NOT EXISTS article_tags (
   CONSTRAINT fk_article_tags_tag FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(128) NOT NULL,
+  expires INT UNSIGNED NOT NULL,
+  data MEDIUMTEXT NOT NULL,
+  PRIMARY KEY (session_id),
+  KEY idx_sessions_expires (expires)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO users (name, email, password_hash, role)
 SELECT 'Administraator', 'admin@filmisfaar.local', '$2a$12$JjT4.ZA4Az0HsmM4gF2UJeoLsGZb1M7hZ0uGzW7tOa2nqXqZ2B1PK', 'admin'
 WHERE NOT EXISTS (

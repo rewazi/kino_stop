@@ -124,6 +124,16 @@ export async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
+    await adminConnection.query(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        session_id VARCHAR(128) NOT NULL,
+        expires INT UNSIGNED NOT NULL,
+        data MEDIUMTEXT NOT NULL,
+        PRIMARY KEY (session_id),
+        KEY idx_sessions_expires (expires)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+
     await seedDefaultArticles();
 
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@filmisfaar.local';
